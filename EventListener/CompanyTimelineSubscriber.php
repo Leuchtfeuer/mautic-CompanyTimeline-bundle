@@ -101,7 +101,7 @@ class CompanyTimelineSubscriber implements EventSubscriberInterface
                     $this->timelineTagAdded($event, $type);
                     break;
 
-                case 'company.tagremoved':
+                case 'company.tagremove':
                     $this->timelineTagRemoved($event, $type);
                     break;
 
@@ -152,7 +152,7 @@ class CompanyTimelineSubscriber implements EventSubscriberInterface
         $this->addCompanyTagsEvent(
             $event,
             $eventType,
-            'autic.company_timeline.timeline.companytag.'.$action,
+            'mautic.company_timeline.timeline.companytag.'.$action,
             'ri-add-box-fill',
             'company',
             'company_tag',
@@ -192,7 +192,7 @@ class CompanyTimelineSubscriber implements EventSubscriberInterface
         $this->addCompanyCreatedEvent(
             $event,
             $eventType,
-            $this->translator->trans('autic.company_timeline.timeline.company.created'),
+            $this->translator->trans('mautic.company_timeline.timeline.company.created'),
             'ri-add-box-fill',
         );
     }
