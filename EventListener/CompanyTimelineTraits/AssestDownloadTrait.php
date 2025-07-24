@@ -7,14 +7,12 @@ use MauticPlugin\CompanyTimelineBundle\Event\CompanyTimelineEvent;
 
 trait AssestDownloadTrait
 {
-
     private function addLeadsAssetDownload(
         CompanyTimelineEvent $event,
         string $eventType,
         string $eventTypeName,
         string $icon,
-    )
-    {
+    ): void {
         $event->addEventType($eventType, $eventTypeName);
         $event->addSerializerGroup('assetList');
 
@@ -34,15 +32,14 @@ trait AssestDownloadTrait
             // Get the downloads for the lead
             $this->addAssetDownload($lead, $event, $eventType, $eventTypeName);
         }
-
     }
 
     private function addAssetDownload(Lead $lead, CompanyTimelineEvent $event, string $eventType, string $eventTypeName): void
     {
-        $leadId = $lead->getId();
+        $leadId    = $lead->getId();
         $downloads = $this->assetModel->getDownloadRepository()->getLeadDownloads($leadId, $event->getQueryOptions());
 
-//        $downloads = $this->downloadRepository->getLeadDownloads($event->getLeadId(), $event->getQueryOptions());
+        //        $downloads = $this->downloadRepository->getLeadDownloads($event->getLeadId(), $event->getQueryOptions());
 
         // Add total number to counter
         $event->addToCounter($eventType, $downloads);

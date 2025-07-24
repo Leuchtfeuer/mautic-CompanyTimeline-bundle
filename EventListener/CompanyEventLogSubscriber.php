@@ -6,15 +6,13 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\LeadBundle\Entity\Import;
 use Mautic\LeadBundle\Event\CompanyEvent;
 use Mautic\LeadBundle\Event\ImportEvent;
-use Mautic\LeadBundle\Event\ImportMappingEvent;
 use Mautic\LeadBundle\Event\ImportProcessEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\CompanyModel;
 use MauticPlugin\CompanyTimelineBundle\Model\CustomCompanyEventLogModel;
 use MauticPlugin\LeuchtfeuerCompanyTagsBundle\Event\CompanyTagsEvent;
-use MauticPlugin\LeuchtfeuerCompanyTagsBundle\LeuchtfeuerCompanyTagsBundle;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use MauticPlugin\LeuchtfeuerCompanyTagsBundle\LeuchtfeuerCompanyTagsEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CompanyEventLogSubscriber implements EventSubscriberInterface
 {
@@ -22,7 +20,6 @@ class CompanyEventLogSubscriber implements EventSubscriberInterface
         private CustomCompanyEventLogModel $customCompanyEventLogModel,
         private IpLookupHelper $ipLookupHelper,
         private CompanyModel $companyModel
-
     ) {
         // Constructor logic if needed
     }
@@ -30,10 +27,10 @@ class CompanyEventLogSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-//            LeadEvents::IMPORT_ON_PROCESS       => ['onImportProcess'],
-//            LeadEvents::IMPORT_POST_SAVE => [
-//                ['onLeadImportSave', 0],
-//            ],
+            //            LeadEvents::IMPORT_ON_PROCESS       => ['onImportProcess'],
+            //            LeadEvents::IMPORT_POST_SAVE => [
+            //                ['onLeadImportSave', 0],
+            //            ],
 
             LeadEvents::COMPANY_POST_SAVE => [
                 ['onCompanyPointsChanged', 0],
@@ -43,7 +40,6 @@ class CompanyEventLogSubscriber implements EventSubscriberInterface
                 ['onCompanyTagPosUpdate', 0],
             ],
         ];
-
     }
 
     public function onCompanyTagPosUpdate(CompanyTagsEvent $event): void
@@ -78,13 +74,12 @@ class CompanyEventLogSubscriber implements EventSubscriberInterface
         );
     }
 
-    public function onImportProcess(ImportProcessEvent $event)
+    public function onImportProcess(ImportProcessEvent $event): void
     {
-
         if ($event->importIsForObject('company')) {
-            $lead = $event->getLead();
+            $lead    = $event->getLead();
             $details = $event->getChanges();
-            $log = [
+            $log     = [
                 'bundle'    => 'company',
                 'object'    => 'import',
                 'objectId'  => $lead->getId(),
@@ -96,7 +91,7 @@ class CompanyEventLogSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function onLeadImportSave(ImportEvent $event)
+    public function onLeadImportSave(ImportEvent $event): void
     {
         $entity = $event->getEntity();
         assert($entity instanceof Import);
@@ -108,9 +103,6 @@ class CompanyEventLogSubscriber implements EventSubscriberInterface
         if (!$primaryCompany) {
             return;
         }
-        $companies = $this->companyModel->getCompanyLeadRepository()->getCompaniesByLeadId($lead->getId());
-        if (empty($companies)) {
-            return;
-        }
+        $this->companyModel->getCompanyLeadRepository()->getCompaniesByLeadId($lead->getId());
     }
 }

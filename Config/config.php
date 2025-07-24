@@ -1,4 +1,5 @@
 <?php
+
 return [
     'name'        => 'Leuchtfeuer Digital Marketing GmbH',
     'description' => 'Add a detailed history tab for Companies',
@@ -7,20 +8,20 @@ return [
     'services'    => [
         'integrations' => [
             'mautic.integration.companytimeline' => [
-                'class' => \MauticPlugin\CompanyTimelineBundle\Integration\CompanyTimelineIntegration::class,
+                'class' => MauticPlugin\CompanyTimelineBundle\Integration\CompanyTimelineIntegration::class,
                 'tags'  => [
                     'mautic.integration',
                     'mautic.basic_integration',
                 ],
             ],
             'mautic.integration.companytimeline.configuration' => [
-                'class' => \MauticPlugin\CompanyTimelineBundle\Integration\Support\ConfigSupport::class,
+                'class' => MauticPlugin\CompanyTimelineBundle\Integration\Support\ConfigSupport::class,
                 'tags'  => [
                     'mautic.config_integration',
                 ],
             ],
             'mautic.integration.companytimeline.config' => [
-                'class' => \MauticPlugin\CompanyTimelineBundle\Integration\Config::class,
+                'class' => MauticPlugin\CompanyTimelineBundle\Integration\Config::class,
                 'tags'  => [
                     'mautic.integrations.helper',
                 ],

@@ -39,7 +39,6 @@ class CompanyTimelineSubscriberTest extends MauticMysqlTestCase
         $this->adjustPoints($company);
         $this->addEmailActions('read');
 
-
         $translation = self::getContainer()->get('translator');
         assert($translation instanceof \Symfony\Contracts\Translation\TranslatorInterface);
         $companyTitleToCreate = $translation->trans('mautic.company_timeline.timeline.company.created');
@@ -54,12 +53,10 @@ class CompanyTimelineSubscriberTest extends MauticMysqlTestCase
             ['%tag%' => $companyTag1->getTag()]
         );
 
-
         self::assertStringContainsString($companyTitleToTagAdded, $this->client->getResponse()->getContent());
         self::assertStringContainsString($companyTitleToTagRemoved, $this->client->getResponse()->getContent());
-//        self::assertStringContainsString('Email read', $this->client->getResponse()->getContent());
-//        self::assertStringContainsString('Test User Email 1 read:', $this->client->getResponse()->getContent());
-
+        //        self::assertStringContainsString('Email read', $this->client->getResponse()->getContent());
+        //        self::assertStringContainsString('Test User Email 1 read:', $this->client->getResponse()->getContent());
     }
 
     public function addEmailActions(string $action)
@@ -70,7 +67,7 @@ class CompanyTimelineSubscriberTest extends MauticMysqlTestCase
         $email = new Email();
         $email->setName('Test Email');
         $email->setSubject('Test Email Subject');
-//        $email->setText('This is a test email body.');
+        //        $email->setText('This is a test email body.');
         $email->setIsPublished(true);
         $email->setDateAdded(new \DateTime());
         $email->setDateModified(new \DateTime());
@@ -79,9 +76,9 @@ class CompanyTimelineSubscriberTest extends MauticMysqlTestCase
         $this->em->flush();
 
         $contacts = [
-            $this->createLead('Lead 1' . uniqid() . '@example.com', 'Test User Email 1 '.$action),
-            $this->createLead('Lead 2' . uniqid() . '@example.com', 'Test User Email 2 '.$action),
-            $this->createLead('Lead 3' . uniqid() . '@example.com', 'Test User Email 3 '.$action),
+            $this->createLead('Lead 1'.uniqid().'@example.com', 'Test User Email 1 '.$action),
+            $this->createLead('Lead 2'.uniqid().'@example.com', 'Test User Email 2 '.$action),
+            $this->createLead('Lead 3'.uniqid().'@example.com', 'Test User Email 3 '.$action),
         ];
 
         $this->emulateEmailSend($email, $contacts, $action);
@@ -119,68 +116,64 @@ class CompanyTimelineSubscriberTest extends MauticMysqlTestCase
             $emailStat->setEmailAddress($contact->getEmail());
             $emailStat->setLead($contact);
             $emailStat->setDateSent(new \DateTime());
-            if ($status === 'sent') {
+            if ('sent' === $status) {
                 $emailStat->setIsRead(true);
             }
-            if ($status === 'read') {
+            if ('read' === $status) {
                 $emailStat->setIsRead(true);
             }
-            if ($status === 'sent') {
+            if ('sent' === $status) {
                 $emailStat->setDateSent(new \DateTime());
             }
             $listEmailStat[] = $emailStat;
-
         }
         $emailStatModel->saveEntities($listEmailStat);
-
     }
 
     public function adjustPoints($company): void
     {
         $companyModel = self::getContainer()->get('mautic.lead.model.company');
         assert($companyModel instanceof \Mautic\LeadBundle\Model\CompanyModel);
-        $crawler = $this->client->request('GET', '/s/companies/edit/'.$company->getId());
-        $form = $crawler->filter('form[name=company]')->form();
-        $data = $form->getValues();
+        $crawler                                  = $this->client->request('GET', '/s/companies/edit/'.$company->getId());
+        $form                                     = $crawler->filter('form[name=company]')->form();
+        $data                                     = $form->getValues();
         $data['company[companyscore_calculated]'] = 20;
         $form->setValues($data);
         $this->client->submit($form, $data);
         $this->assertTrue($this->client->getResponse()->isSuccessful(), 'Company score adjustment should be successful.');
-
     }
 
-    public function createCompany(string $name, int $score = 0): \Mautic\LeadBundle\Entity\Company
+    public function createCompany(string $name, int $score = 0): Company
     {
         $companyModel = self::getContainer()->get('mautic.lead.model.company');
         assert($companyModel instanceof \Mautic\LeadBundle\Model\CompanyModel);
 
-        $company = new \Mautic\LeadBundle\Entity\Company();
+        $company = new Company();
         $company->setName($name);
 
         $companyModel->saveEntity($company);
 
         return $company;
-//        $crawler =$this->client->request('GET', '/s/companies/new/');
-//
-//        $form = $crawler->filter('form[name=company]')->form();
-//        $data = $form->getValues();
-//        $data['company[companyname]'] = $name;
-//
-//        $form->setValues($data);
-//        $this->client->submit($form, $data);
-//        $this->assertTrue($this->client->getResponse()->isSuccessful(), 'Company creation should be successful.');
-//        $companyModel = self::getContainer()->get('mautic.lead.model.company');
-//        assert($companyModel instanceof \Mautic\LeadBundle\Model\CompanyModel);
-//        return $companyModel->getRepository()->findOneBy([], ['id' => 'DESC']);
-
+        //        $crawler =$this->client->request('GET', '/s/companies/new/');
+        //
+        //        $form = $crawler->filter('form[name=company]')->form();
+        //        $data = $form->getValues();
+        //        $data['company[companyname]'] = $name;
+        //
+        //        $form->setValues($data);
+        //        $this->client->submit($form, $data);
+        //        $this->assertTrue($this->client->getResponse()->isSuccessful(), 'Company creation should be successful.');
+        //        $companyModel = self::getContainer()->get('mautic.lead.model.company');
+        //        assert($companyModel instanceof \Mautic\LeadBundle\Model\CompanyModel);
+        //        return $companyModel->getRepository()->findOneBy([], ['id' => 'DESC']);
     }
 
-    public function createCompanySegment(string $name): \MauticPlugin\LeuchtfeuerCompanySegmentsBundle\Entity\CompanySegment
+    public function createCompanySegment(string $name): CompanySegment
     {
         $companySegmentModel = self::getContainer()->get('mautic.company_segments.model.company_segment');
         assert($companySegmentModel instanceof \MauticPlugin\LeuchtfeuerCompanySegmentsBundle\Model\CompanySegmentModel);
 
-        $companySegment = new \MauticPlugin\LeuchtfeuerCompanySegmentsBundle\Entity\CompanySegment();
+        $companySegment = new CompanySegment();
         $companySegment->setName($name);
 
         $companySegmentModel->saveEntity($companySegment);
@@ -204,30 +197,32 @@ class CompanyTimelineSubscriberTest extends MauticMysqlTestCase
 
     public function addTagToCompany(Company $company, CompanyTags $tag): Company
     {
-        $tagsToAdd = [$tag];
+        $tagsToAdd        = [$tag];
         $companyTagsModel = self::getContainer()->get('mautic.companytag.model.companytag');
         assert($companyTagsModel instanceof \MauticPlugin\LeuchtfeuerCompanyTagsBundle\Model\CompanyTagModel);
         $companyTagsModel->updateCompanyTags($company, $tagsToAdd, []);
+
         return $company;
     }
 
     public function removeTagFromCompany(Company $company, CompanyTags $tag): Company
     {
-        $tagsToRemove = [$tag];
+        $tagsToRemove     = [$tag];
         $companyTagsModel = self::getContainer()->get('mautic.companytag.model.companytag');
         assert($companyTagsModel instanceof \MauticPlugin\LeuchtfeuerCompanyTagsBundle\Model\CompanyTagModel);
         $companyTagsModel->updateCompanyTags($company, [], $tagsToRemove);
+
         return $company;
     }
 
-    private function createCompanyTag(string $name): \MauticPlugin\LeuchtfeuerCompanyTagsBundle\Entity\CompanyTags
+    private function createCompanyTag(string $name): CompanyTags
     {
         $companyTagsModel = self::getContainer()->get('mautic.companytag.model.companytag');
         assert($companyTagsModel instanceof \MauticPlugin\LeuchtfeuerCompanyTagsBundle\Model\CompanyTagModel);
-        $companyTag = new \MauticPlugin\LeuchtfeuerCompanyTagsBundle\Entity\CompanyTags();
+        $companyTag = new CompanyTags();
         $companyTag->setTag($name);
         $companyTagsModel->saveEntity($companyTag);
-        return $companyTag;
 
+        return $companyTag;
     }
 }

@@ -22,5 +22,4 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->alias('mautic.company_timeline.model.custom_company_event_log', MauticPlugin\CompanyTimelineBundle\Model\CustomCompanyEventLogModel::class);
     $services->alias('mautic.email.model.stat', Mautic\EmailBundle\Model\EmailStatModel::class);
-
 };

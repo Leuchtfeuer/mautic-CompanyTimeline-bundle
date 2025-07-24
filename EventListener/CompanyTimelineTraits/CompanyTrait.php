@@ -3,27 +3,39 @@
 namespace MauticPlugin\CompanyTimelineBundle\EventListener\CompanyTimelineTraits;
 
 use MauticPlugin\CompanyTimelineBundle\Event\CompanyTimelineEvent;
+
 trait CompanyTrait
 {
     private function addCompanyCreatedEvent(
         CompanyTimelineEvent $event,
         string $eventType,
-        string $eventTypeName,
         string $icon,
     ): void {
-        $event->addEventType($eventType, $eventTypeName);
+        $companyName = 'Unknown Company';
+        $dateAdded   = 'Unknown Date';
+        if ($event->getCompany()) {
+            $companyName = $event->getCompany()->getName();
+            if (null !== $event->getCompany()->getDateAdded()) {
+                $dateAdded = $event->getCompany()->getDateAdded()->format('Y-m-d H:i:s');
+            }
+        }
+        $eventName = $this->translator->trans('mautic.company_timeline.timeline.company.created.label', [
+            '%company%' => $companyName,
+        ]);
+
+        $event->addEventType($eventType, $eventName);
         $company = $event->getCompany();
+
         $data = [
-            'timestamp' => $company->getDateAdded()->format('Y-m-d H:i:s'),
-            'event' => $eventType,
-            'extra' => [
-                'object_id' => $company->getId(),
+            'timestamp' => $dateAdded,
+            'event'     => $eventType,
+            'extra'     => [
+                'object_id'   => $company->getId(),
                 'object_name' => $company->getName(),
             ],
-            'icon' => $icon,
-            'eventLabel' => $eventTypeName,
-            'eventType' => $eventType,
-
+            'icon'       => $icon,
+            'eventLabel' => $eventName,
+            'eventType'  => $this->translator->trans('mautic.company_timeline.timeline.company.created'),
         ];
 
         $event->addEvent($data);

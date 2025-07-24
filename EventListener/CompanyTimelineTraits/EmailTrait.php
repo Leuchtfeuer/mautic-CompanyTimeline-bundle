@@ -7,7 +7,7 @@ use MauticPlugin\CompanyTimelineBundle\Event\CompanyTimelineEvent;
 
 trait EmailTrait
 {
-    private function addEmailsEvent(CompanyTimelineEvent $event)
+    private function addEmailsEvent(CompanyTimelineEvent $event): void
     {
         $leads = $event->getLeads();
         foreach ($leads as $lead) {
@@ -41,9 +41,9 @@ trait EmailTrait
 
         $queryOptions          = $event->getQueryOptions();
         $queryOptions['state'] = $state;
-//        $stats                 = $this->statRepository->getLeadStats($lead->getId(), $queryOptions);
+        //        $stats                 = $this->statRepository->getLeadStats($lead->getId(), $queryOptions);
         $stats                 = $this->emailStatModel->getRepository()->getLeadStats($lead->getId(), $queryOptions);
-//        dump($stats);
+        //        dump($stats);
 
         // Add total to counter
         $event->addToCounter($eventTypeKey, $stats);
@@ -68,10 +68,9 @@ trait EmailTrait
                 } else {
                     $eventName = $lead->getName().': '.$label;
                 }
+                $dateSent = 'read';
                 if ('failed' == $state or 'sent' == $state) { // this is to get the correct column for date dateSent
                     $dateSent = 'sent';
-                } else {
-                    $dateSent = 'read';
                 }
 
                 $contactId = $stat['lead_id'];
@@ -96,5 +95,4 @@ trait EmailTrait
             }
         }
     }
-
 }

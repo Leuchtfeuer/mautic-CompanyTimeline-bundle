@@ -17,7 +17,7 @@ class RouteSubscriber implements EventSubscriberInterface
 
     public function onBuildRoute(RouteEvent $event): void
     {
-//        dd('The mautic_company_action route is already defined. Please remove the CompanyTimelineBundle plugin to avoid conflicts.');
+        //        dd('The mautic_company_action route is already defined. Please remove the CompanyTimelineBundle plugin to avoid conflicts.');
         $routes = $event->getCollection()->all();
 
         if ('main' === $event->getType() && isset($routes['mautic_company_action'])) {

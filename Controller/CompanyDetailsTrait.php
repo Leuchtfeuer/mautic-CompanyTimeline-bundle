@@ -39,6 +39,7 @@ trait CompanyDetailsTrait
         }
         /** @var CustomCompanyEventLogModel $model */
         $model = $this->getModel('company_timeline.custom_company_event_log');
+
         return $model->getEngagements($company, $filters, $orderBy, $page, $limit);
     }
 

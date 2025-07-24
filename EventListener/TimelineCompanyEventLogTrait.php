@@ -3,10 +3,7 @@
 namespace MauticPlugin\CompanyTimelineBundle\EventListener;
 
 use Mautic\LeadBundle\Entity\CompanyLead;
-use Mautic\LeadBundle\Event\LeadTimelineEvent;
-use Mautic\LeadBundle\Model\ChannelTimelineInterface;
 use MauticPlugin\CompanyTimelineBundle\Event\CompanyTimelineEvent;
-use Mautic\LeadBundle\Entity\Lead;
 
 trait TimelineCompanyEventLogTrait
 {
@@ -115,8 +112,7 @@ trait TimelineCompanyEventLogTrait
         string $eventType,
         string $eventTypeName,
         string $icon,
-    )
-    {
+    ): void {
         $leads = $event->getLeads();
 
         foreach ($leads as $lead) {
@@ -134,25 +130,17 @@ trait TimelineCompanyEventLogTrait
             assert($companyLead instanceof CompanyLead);
             $data = [
                 'timestamp' => $companyLead->getDateAdded()->format('Y-m-d H:i:s'),
-                'event' => $eventType,
-                'extra' => [
-                    'object_id' => $companyLead->getLead()->getId(),
+                'event'     => $eventType,
+                'extra'     => [
+                    'object_id'   => $companyLead->getLead()->getId(),
                     'object_name' => $companyLead->getLead()->getName(),
                 ],
-                'icon' => $icon,
+                'icon'       => $icon,
                 'eventLabel' => $companyLead->getLead()->getName().': '.$eventTypeName,
-                'eventType' => $eventType,
-
+                'eventType'  => $eventType,
             ];
 
             $event->addEvent($data);
         }
     }
-
-
-
-
-
-
-
 }

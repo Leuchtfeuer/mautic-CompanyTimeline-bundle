@@ -6,18 +6,16 @@ use MauticPlugin\CompanyTimelineBundle\Event\CompanyTimelineEvent;
 
 trait CompanyTagsTrait
 {
-
     private function addCompanyTagsEvent(
         CompanyTimelineEvent $event,
-                             $eventType,
-                             $eventTypeName,
-                             $icon,
-                             $bundle = null,
-                             $object = null,
-                             $action = null,
-                             $contentTemplate = null
-    )
-    {
+        $eventType,
+        $eventTypeName,
+        $icon,
+        $bundle = null,
+        $object = null,
+        $action = null,
+        $contentTemplate = null
+    ): void {
         $eventTypeName = $this->translator->trans($eventTypeName);
         $event->addEventType($eventType, $eventTypeName);
 

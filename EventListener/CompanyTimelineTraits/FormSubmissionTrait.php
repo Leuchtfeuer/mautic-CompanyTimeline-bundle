@@ -7,7 +7,6 @@ use MauticPlugin\CompanyTimelineBundle\Event\CompanyTimelineEvent;
 
 trait FormSubmissionTrait
 {
-
     public function addFormsSubmittedEvent(CompanyTimelineEvent $event): void
     {
         $leads = $event->getLeads();
@@ -19,11 +18,9 @@ trait FormSubmissionTrait
             // Add form submissions
             $this->addFormSubmittedEvent($event, $lead);
         }
-
-
     }
 
-    private function addFormSubmittedEvent(CompanyTimelineEvent $event, Lead $lead)
+    private function addFormSubmittedEvent(CompanyTimelineEvent $event, Lead $lead): void
     {
         // Set available event types
         $eventTypeKey  = 'form.submitted';
@@ -35,10 +32,10 @@ trait FormSubmissionTrait
             return;
         }
 
-//        $rows = $this->submissionRepository->getSubmissions($event->getQueryOptions());
-        $queryOptions = $event->getQueryOptions();
+        //        $rows = $this->submissionRepository->getSubmissions($event->getQueryOptions());
+        $queryOptions           = $event->getQueryOptions();
         $queryOptions['leadId'] = $lead->getId();
-        $rows = $this->submissionModel->getRepository()->getSubmissions($queryOptions);
+        $rows                   = $this->submissionModel->getRepository()->getSubmissions($queryOptions);
 
         // Add total to counter
         $event->addToCounter($eventTypeKey, $rows);

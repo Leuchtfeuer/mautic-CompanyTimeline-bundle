@@ -12,5 +12,4 @@ final class CompanyTimelineEvents
      * @var string
      */
     public const TIMELINE_ON_GENERATE = 'mautic.company_timeline_on_generate';
-
 }

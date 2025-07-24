@@ -3,23 +3,18 @@
 namespace MauticPlugin\CompanyTimelineBundle\Model;
 
 use Doctrine\DBAL\ArrayParameterType;
+use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyLead;
 use Mautic\LeadBundle\Entity\Lead;
 use MauticPlugin\CompanyTimelineBundle\CompanyTimelineEvents;
 use MauticPlugin\CompanyTimelineBundle\Event\CompanyTimelineEvent;
-use MauticPlugin\CompanyTimelineBundle\Model\TimelineTrait;
 use MauticPlugin\LeuchtfeuerCompanySegmentsBundle\Entity\CompanyEventLog;
-use MauticPlugin\LeuchtfeuerCompanySegmentsBundle\Entity\CompanySegment;
-use MauticPlugin\LeuchtfeuerCompanySegmentsBundle\LeuchfeuerCompanySegmentsEvents;
 use MauticPlugin\LeuchtfeuerCompanySegmentsBundle\Model\CompanyEventLogModel as BaseCompanyEventLogModel;
-use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use MauticPlugin\LeuchtfeuerCompanyTagsBundle\Entity\CompanyTags;
-
 
 class CustomCompanyEventLogModel extends BaseCompanyEventLogModel
 {
-
     use TimelineTrait;
 
     /**
@@ -31,13 +26,11 @@ class CustomCompanyEventLogModel extends BaseCompanyEventLogModel
         if (!is_null($company)) {
             $leadsId = $this->em->getRepository(CompanyLead::class)->getCompanyLeads($company->getId());
             $leadsId = array_column($leadsId, 'lead_id');
-            $leads = $this->em->getRepository(Lead::class)->getEntities(['ids' => $leadsId, 'ignore_paginator' => false]);
+            $leads   = $this->em->getRepository(Lead::class)->getEntities(['ids' => $leadsId, 'ignore_paginator' => false]);
         }
         $event = $this->dispatcher->dispatch(
             new CompanyTimelineEvent($company, $filters, $orderBy, $page, $limit, $forTimeline, $this->coreParametersHelper->get('site_url'), $leads),
-//            new \MauticPlugin\LeuchtfeuerCompanySegmentsBundle\Event\CompanyTimelineEvent($company, $filters, $orderBy, $page, $limit, $forTimeline, $this->coreParametersHelper->get('site_url')),
             CompanyTimelineEvents::TIMELINE_ON_GENERATE
-//            LeuchfeuerCompanySegmentsEvents::TIMELINE_ON_GENERATE
         );
 
         $payload = [
@@ -60,30 +53,28 @@ class CustomCompanyEventLogModel extends BaseCompanyEventLogModel
     public function getEngagementTypes()
     {
         $event = new CompanyTimelineEvent();
-//        $event = new \MauticPlugin\LeuchtfeuerCompanySegmentsBundle\Event\CompanyTimelineEvent();
+        //        $event = new \MauticPlugin\LeuchtfeuerCompanySegmentsBundle\Event\CompanyTimelineEvent();
         $event->fetchTypesOnly();
 
         $this->dispatcher->dispatch($event, CompanyTimelineEvents::TIMELINE_ON_GENERATE);
-//        $this->dispatcher->dispatch($event, LeuchfeuerCompanySegmentsEvents::TIMELINE_ON_GENERATE);
+        //        $this->dispatcher->dispatch($event, LeuchfeuerCompanySegmentsEvents::TIMELINE_ON_GENERATE);
 
         return $event->getEventTypes();
     }
 
     /**
      * Get engagement counts by time unit.
-     *
-     * @param string $unit
      */
-//    public function getEngagementCount(Company $company, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $unit = 'm', ?ChartQuery $chartQuery = null): array
-//    {
-//        $event = new CompanyTimelineEvent($company);
-//        $event->setCountOnly($dateFrom, $dateTo, $unit, $chartQuery);
-//
-////        $this->dispatcher->dispatch($event, CompanyTimelineEvents::TIMELINE_ON_GENERATE);
-//        $this->dispatcher->dispatch($event, LeuchfeuerCompanySegmentsEvents::TIMELINE_ON_GENERATE);
-//
-//        return $event->getEventCounter();
-//    }
+    //    public function getEngagementCount(Company $company, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $unit = 'm', ?ChartQuery $chartQuery = null): array
+    //    {
+    //        $event = new CompanyTimelineEvent($company);
+    //        $event->setCountOnly($dateFrom, $dateTo, $unit, $chartQuery);
+    //
+    // //        $this->dispatcher->dispatch($event, CompanyTimelineEvents::TIMELINE_ON_GENERATE);
+    //        $this->dispatcher->dispatch($event, LeuchfeuerCompanySegmentsEvents::TIMELINE_ON_GENERATE);
+    //
+    //        return $event->getEventCounter();
+    //    }
 
     /**
      * @param ?string                          $bundle
@@ -96,7 +87,7 @@ class CustomCompanyEventLogModel extends BaseCompanyEventLogModel
     public function getEvents(?Company $company = null, $bundle = null, $object = null, $actions = null, array $options = [])
     {
         $alias = $this->getRepository()->getTableAlias();
-//        $qb    = $this->getRepository()->getEntityManager()->getConnection()->createQueryBuilder()
+        //        $qb    = $this->getRepository()->getEntityManager()->getConnection()->createQueryBuilder()
         $qb    = $this->em->getConnection()->createQueryBuilder()
             ->select('*')
             ->from(MAUTIC_TABLE_PREFIX.'company_event_log', $alias);
@@ -137,10 +128,6 @@ class CustomCompanyEventLogModel extends BaseCompanyEventLogModel
 
     /**
      * Save a company event log for a specific action and company segment.
-     *
-     * @param string $action
-     * @param Company $company
-     * @param array<CompanyTags> $tags
      */
     public function saveCompanyEventLogOfCompanyTags(Company $company, array $actionTags): void
     {
@@ -149,7 +136,7 @@ class CustomCompanyEventLogModel extends BaseCompanyEventLogModel
                 if (!$tag instanceof CompanyTags) {
                     continue;
                 }
-                $action = $keyTag === 'added' ? 'added' : 'removed';
+                $action = 'added' === $keyTag ? 'added' : 'removed';
                 $this->saveUniqueCompanyEventLogOfCompany($company, $tag, $action);
             }
         }
@@ -176,7 +163,7 @@ class CustomCompanyEventLogModel extends BaseCompanyEventLogModel
 
         $companyEventLog->setProperties([
             'company_tag_id'       => $tagId,
-            'company_tag_name' => $tagName,
+            'company_tag_name'     => $tagName,
             'company_id'           => $company->getId(),
             'object_description'   => $tagName,
         ]);
@@ -185,7 +172,7 @@ class CustomCompanyEventLogModel extends BaseCompanyEventLogModel
         $this->saveEntity($companyEventLog);
     }
 
-    public function saveCompanyScoreCalculatedChanged(company $company, array $changes): void
+    public function saveCompanyScoreCalculatedChanged(Company $company, array $changes): void
     {
         $companyEventLog = new CompanyEventLog();
         $companyEventLog->setCompany($company);
@@ -215,7 +202,6 @@ class CustomCompanyEventLogModel extends BaseCompanyEventLogModel
         $companyEventLog->setUserId($userId); // Set the user ID if available
         $companyEventLog->setUserName($userName); // or use the actual user name if available
         $this->saveEntity($companyEventLog);
-
     }
 
     public function writeToLog(array $log): void

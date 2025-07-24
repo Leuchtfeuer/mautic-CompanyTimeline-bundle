@@ -6,7 +6,6 @@ namespace MauticPlugin\CompanyTimelineBundle\Tests\DefaultTraits;
 
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Entity\Plugin;
-use MauticPlugin\CompanyTimelineBundle\Integration\CompanyTimelineIntegration;
 
 trait ActivePluginTrait
 {
@@ -25,15 +24,14 @@ trait ActivePluginTrait
 
         // Install Company Tags
         $this->installPlugin('LeuchtfeuerCompanyTagsBundle');
-
     }
 
     private function installPlugin(string $nameBundle, bool $isPublished = true): void
     {
         $nameIntegration = str_replace('Bundle', '', $nameBundle);
-        $integration = $this->em->getRepository(Integration::class)->findOneBy(['name' => $nameIntegration]);
+        $integration     = $this->em->getRepository(Integration::class)->findOneBy(['name' => $nameIntegration]);
         if (empty($integration)) {
-            $plugin = $this->em->getRepository(Plugin::class)->findOneBy(['bundle' => $nameBundle]);
+            $plugin      = $this->em->getRepository(Plugin::class)->findOneBy(['bundle' => $nameBundle]);
             $integration = new Integration();
             $integration->setName($nameIntegration);
             $integration->setPlugin($plugin);

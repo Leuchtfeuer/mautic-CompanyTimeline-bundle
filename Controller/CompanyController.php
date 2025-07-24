@@ -13,10 +13,10 @@ use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Model\CompanyModel;
+use MauticPlugin\CompanyTimelineBundle\Integration\Config;
 use MauticPlugin\CompanyTimelineBundle\Model\CustomCompanyEventLogModel;
 use MauticPlugin\LeuchtfeuerCompanyTagsBundle\Controller\CompanyController as CompanyTagsController;
 use MauticPlugin\LeuchtfeuerCompanyTagsBundle\Integration\Config as CompanyTagsConfig;
-use MauticPlugin\CompanyTimelineBundle\Integration\Config;
 use MauticPlugin\LeuchtfeuerCompanyTagsBundle\Model\CompanyTagModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -43,7 +43,7 @@ class CompanyController extends CompanyTagsController
         public RequestStack $requestStack,
         CorePermissions $security,
         private CompanyTagModel $companyTagModel,
-        private CompanyTagsConfig $companyTagsConfig,
+        CompanyTagsConfig $companyTagsConfig,
         private CustomCompanyEventLogModel $customCompanyEventLogModel,
         private Config $config
     ) {
@@ -89,7 +89,7 @@ class CompanyController extends CompanyTagsController
             'contentTemplate' => 'Mautic\LeadBundle\Controller\CompanyController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_company_index',
-                'mauticContent' => 'company',
+                'mauticContent' => 'lead',
             ],
         ];
 
@@ -158,7 +158,18 @@ class CompanyController extends CompanyTagsController
                     'limit'             => $contacts['limit'],
                     'events'            => $this->getCompanyEngagements($company),
                 ],
-                'contentTemplate' => '@CompanyTimeline/Company/company.html.twig',
+                'contentTemplate'        => '@CompanyTimeline/Company/company.html.twig',
+                'passthroughVars'        => [
+                    'activeLink'    => '#mautic_company_index',
+                    'mauticContent' => 'leadTimeline',
+                    'route'         => $this->generateUrl(
+                        'mautic_company_action',
+                        [
+                            'objectAction' => 'view',
+                            'objectId'     => $company->getId(),
+                        ]
+                    ),
+                ],
             ]
         );
     }

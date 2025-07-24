@@ -19,16 +19,11 @@ trait PageHitTrait
         $event->addEventType($eventTypeKey, $eventTypeName);
         $event->addSerializerGroup(['pageList', 'hitDetails']);
 
-
         if (!$event->isApplicable($eventTypeKey)) {
             return;
         }
 
         $leads = $event->getLeads();
-        if (empty($leads)) {
-            return;
-        }
-
 
         foreach ($leads as $lead) {
             if (!$lead instanceof Lead) {
@@ -36,17 +31,16 @@ trait PageHitTrait
             }
 
             // Add page hits
-            $this->addPageHits($event, $lead,$eventTypeKey,$eventTypeName);
+            $this->addPageHits($event, $lead, $eventTypeKey, $eventTypeName);
         }
-
     }
 
     private function addPageHits(CompanyTimelineEvent $event, Lead $lead, string $eventTypeKey, string $eventTypeName): void
     {
-//        dd($event->getQueryOptions());
-        $queryOptions = $event->getQueryOptions();
+        //        dd($event->getQueryOptions());
+        $queryOptions           = $event->getQueryOptions();
         $queryOptions['leadId'] = $lead->getId();
-        $hits = $this->pageModel->getHitRepository()->getLeadHits(
+        $hits                   = $this->pageModel->getHitRepository()->getLeadHits(
             $lead->getId(),
             $queryOptions
         );
@@ -105,7 +99,7 @@ trait PageHitTrait
                         'href'  => $this->router->generate('mautic_page_action', ['objectAction' => 'view', 'objectId' => $hit['page_id']]),
                     ];
                 } else {
-                    $label = $hit['urlTitle'] ?? $hit['url'];
+                    $label      = $hit['urlTitle'] ?? $hit['url'];
                     $eventLabel = [
                         'label'      => $lead->getName().': '.$label,
                         'href'       => $hit['url'],

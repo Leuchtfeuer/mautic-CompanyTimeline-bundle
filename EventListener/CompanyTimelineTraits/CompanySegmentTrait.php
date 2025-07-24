@@ -36,6 +36,10 @@ trait CompanySegmentTrait
             if ($companySegment) {
                 $companySegmentName = $companySegment->getName();
             }
+            $companyName = 'Unknown Company';
+            if ($event->getCompany()) {
+                $companyName = $event->getCompany()->getName();
+            }
             $eventName = $this->translator->trans('mautic.company_segments.timeline.segment.add', [
                 '%segment%' => $companySegmentName,
             ]);
@@ -45,25 +49,32 @@ trait CompanySegmentTrait
                     '%segment%' => $companySegmentName,
                 ]);
             }
-
+            $fromTo = 'from';
+            if ('added' === $action) {
+                $fromTo = 'to';
+            }
             $eventSegmentLabelName = $this->translator->trans('mautic.company_segments.timeline.segment_label_name', [
                 '%segment%' => $companySegmentName,
+                '%action%'  => $action,
+                '%fromto%'  => $fromTo,
             ]);
-            $eventLabel = [
-                'label' => $eventSegmentLabelName,
-                'href'  => $this->router->generate(
-                    'mautic_company_segments_action',
-                    [
-                        'objectAction' => 'view',
-                        'objectId'     => $log['object_id'],
-                    ]
-                ),
-            ];
+
+            //            $eventLabel = [
+            //                'label' => $eventSegmentLabelName,
+            //                'href'  => $this->router->generate(
+            //                    'mautic_company_segments_action',
+            //                    [
+            //                        'objectAction' => 'view',
+            //                        'objectId'     => $log['object_id'],
+            //                    ]
+            //                ),
+            //            ];
+
+            $eventLabel = $eventSegmentLabelName;
 
             $event->addEvent(
                 $this->getEventEntry($log, $eventType, $eventName, $icon, $contentTemplate, $eventLabel)
             );
         }
     }
-
 }

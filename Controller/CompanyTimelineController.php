@@ -92,6 +92,7 @@ class CompanyTimelineController extends CommonController
                 'passthroughVars' => [
                     'route'         => false,
                     'timelineCount' => $events['total'],
+                    'mauticContent' => 'leadTimeline',
                 ],
                 'contentTemplate' => '@CompanyTimeline/Timeline/_list.html.twig',
             ]

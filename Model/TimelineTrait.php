@@ -21,7 +21,7 @@ trait TimelineTrait
      *
      * @return array<mixed>
      */
-    private function getTimelineResults(
+    protected function getTimelineResults(
         QueryBuilder $query,
         array $options,
         $eventNameColumn,
