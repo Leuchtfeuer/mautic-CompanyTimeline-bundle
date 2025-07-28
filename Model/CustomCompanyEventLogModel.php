@@ -50,31 +50,15 @@ class CustomCompanyEventLogModel extends BaseCompanyEventLogModel
     /**
      * @return array
      */
-    public function getEngagementTypes()
+    public function getEngagementTypes(): array
     {
         $event = new CompanyTimelineEvent();
-        //        $event = new \MauticPlugin\LeuchtfeuerCompanySegmentsBundle\Event\CompanyTimelineEvent();
         $event->fetchTypesOnly();
 
         $this->dispatcher->dispatch($event, CompanyTimelineEvents::TIMELINE_ON_GENERATE);
-        //        $this->dispatcher->dispatch($event, LeuchfeuerCompanySegmentsEvents::TIMELINE_ON_GENERATE);
 
         return $event->getEventTypes();
     }
-
-    /**
-     * Get engagement counts by time unit.
-     */
-    //    public function getEngagementCount(Company $company, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $unit = 'm', ?ChartQuery $chartQuery = null): array
-    //    {
-    //        $event = new CompanyTimelineEvent($company);
-    //        $event->setCountOnly($dateFrom, $dateTo, $unit, $chartQuery);
-    //
-    // //        $this->dispatcher->dispatch($event, CompanyTimelineEvents::TIMELINE_ON_GENERATE);
-    //        $this->dispatcher->dispatch($event, LeuchfeuerCompanySegmentsEvents::TIMELINE_ON_GENERATE);
-    //
-    //        return $event->getEventCounter();
-    //    }
 
     /**
      * @param ?string                          $bundle
@@ -87,7 +71,6 @@ class CustomCompanyEventLogModel extends BaseCompanyEventLogModel
     public function getEvents(?Company $company = null, $bundle = null, $object = null, $actions = null, array $options = [])
     {
         $alias = $this->getRepository()->getTableAlias();
-        //        $qb    = $this->getRepository()->getEntityManager()->getConnection()->createQueryBuilder()
         $qb    = $this->em->getConnection()->createQueryBuilder()
             ->select('*')
             ->from(MAUTIC_TABLE_PREFIX.'company_event_log', $alias);
