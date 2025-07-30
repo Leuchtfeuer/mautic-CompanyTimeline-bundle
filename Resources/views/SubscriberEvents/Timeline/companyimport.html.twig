@@ -1,0 +1,26 @@
+{% if event.extra is defined %}
+<dl class="dl-horizontal">
+{#    {{ dump(event.extra) }}#}
+{#    <dt>Points change from </dt>#}
+{#    <dd>{{ event.extra.changes.from }}</dd>#}
+{#    <dt>to</dt>#}
+{#    <dd>#}
+{#        {{ event.extra.changes.to }}#}
+{#    </dd>#}
+    <dt>File :</dt>
+    <dd>{{ event.extra.file }}</dd>
+    <dt>Create by :</dt>
+    <dd><a href="{{ path('mautic_user_action', {'objectAction': 'view', 'objectId': event.extra.created_by_id}) }}">
+        {{ event.extra.created_by_name }}
+        </a>
+    </dd>
+    <dt>Data:</dt>
+    <dd>
+        <br />
+        <ul>
+    {% for key, value in event.extra %}
+        <li>{{ key }} : {{ value }}</li>
+    {% endfor %}
+        </ul>
+</dl>
+{% endif %}
