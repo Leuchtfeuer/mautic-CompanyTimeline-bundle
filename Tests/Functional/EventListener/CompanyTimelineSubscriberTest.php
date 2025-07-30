@@ -1,15 +1,15 @@
 <?php
 
-namespace MauticPlugin\CompanyTimelineBundle\Tests\Functional\EventListener;
+namespace MauticPlugin\LeuchtfeuerCompanyTimelineBundle\Tests\Functional\EventListener;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
-use MauticPlugin\CompanyTimelineBundle\Tests\DefaultTraits\ActivePluginTrait;
 use MauticPlugin\LeuchtfeuerCompanySegmentsBundle\Entity\CompanySegment;
 use MauticPlugin\LeuchtfeuerCompanyTagsBundle\Entity\CompanyTags;
+use MauticPlugin\LeuchtfeuerCompanyTimelineBundle\Tests\DefaultTraits\ActivePluginTrait;
 
 class CompanyTimelineSubscriberTest extends MauticMysqlTestCase
 {
@@ -154,18 +154,6 @@ class CompanyTimelineSubscriberTest extends MauticMysqlTestCase
         $companyModel->saveEntity($company);
 
         return $company;
-        //        $crawler =$this->client->request('GET', '/s/companies/new/');
-        //
-        //        $form = $crawler->filter('form[name=company]')->form();
-        //        $data = $form->getValues();
-        //        $data['company[companyname]'] = $name;
-        //
-        //        $form->setValues($data);
-        //        $this->client->submit($form, $data);
-        //        $this->assertTrue($this->client->getResponse()->isSuccessful(), 'Company creation should be successful.');
-        //        $companyModel = self::getContainer()->get('mautic.lead.model.company');
-        //        assert($companyModel instanceof \Mautic\LeadBundle\Model\CompanyModel);
-        //        return $companyModel->getRepository()->findOneBy([], ['id' => 'DESC']);
     }
 
     public function createCompanySegment(string $name): CompanySegment

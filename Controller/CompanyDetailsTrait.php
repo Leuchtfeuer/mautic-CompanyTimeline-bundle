@@ -1,9 +1,9 @@
 <?php
 
-namespace MauticPlugin\CompanyTimelineBundle\Controller;
+namespace MauticPlugin\LeuchtfeuerCompanyTimelineBundle\Controller;
 
 use Mautic\LeadBundle\Entity\Company;
-use MauticPlugin\CompanyTimelineBundle\Model\CustomCompanyEventLogModel;
+use MauticPlugin\LeuchtfeuerCompanyTimelineBundle\Model\CustomCompanyEventLogModel;
 
 trait CompanyDetailsTrait
 {

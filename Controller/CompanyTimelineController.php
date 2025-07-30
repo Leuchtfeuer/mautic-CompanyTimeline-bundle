@@ -1,6 +1,6 @@
 <?php
 
-namespace MauticPlugin\CompanyTimelineBundle\Controller;
+namespace MauticPlugin\LeuchtfeuerCompanyTimelineBundle\Controller;
 
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Controller\CommonController;
@@ -94,7 +94,7 @@ class CompanyTimelineController extends CommonController
                     'timelineCount' => $events['total'],
                     'mauticContent' => 'leadTimeline',
                 ],
-                'contentTemplate' => '@CompanyTimeline/Timeline/_list.html.twig',
+                'contentTemplate' => '@LeuchtfeuerCompanyTimeline/Timeline/_list.html.twig',
             ]
         );
     }
@@ -156,7 +156,7 @@ class CompanyTimelineController extends CommonController
                     'mauticContent' => 'pluginTimeline',
                     'timelineCount' => $events['total'],
                 ],
-                'contentTemplate' => sprintf('@CompanyTimeline/Timeline/plugin_%s.html.twig', $tmpl),
+                'contentTemplate' => sprintf('@LeuchtfeuerCompanyTimeline/Timeline/plugin_%s.html.twig', $tmpl),
             ]
         );
     }
@@ -218,7 +218,7 @@ class CompanyTimelineController extends CommonController
                     'mauticContent' => 'pluginTimeline',
                     'timelineCount' => $events['total'],
                 ],
-                'contentTemplate' => sprintf('@CompanyTimeline/Timeline/plugin_%s.html.twig', $tmpl),
+                'contentTemplate' => sprintf('@LeuchtfeuerCompanyTimeline/Timeline/plugin_%s.html.twig', $tmpl),
             ]
         );
     }

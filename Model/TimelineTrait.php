@@ -1,6 +1,6 @@
 <?php
 
-namespace MauticPlugin\CompanyTimelineBundle\Model;
+namespace MauticPlugin\LeuchtfeuerCompanyTimelineBundle\Model;
 
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;

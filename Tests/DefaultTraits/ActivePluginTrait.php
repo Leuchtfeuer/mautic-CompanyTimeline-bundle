@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MauticPlugin\CompanyTimelineBundle\Tests\DefaultTraits;
+namespace MauticPlugin\LeuchtfeuerCompanyTimelineBundle\Tests\DefaultTraits;
 
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Entity\Plugin;

@@ -1,12 +1,12 @@
 <?php
 
-namespace MauticPlugin\CompanyTimelineBundle\EventListener\CompanyTimelineTraits;
+namespace MauticPlugin\LeuchtfeuerCompanyTimelineBundle\EventListener\CompanyTimelineTraits;
 
-use MauticPlugin\CompanyTimelineBundle\Event\CompanyTimelineEvent;
+use MauticPlugin\LeuchtfeuerCompanyTimelineBundle\Event\LeuchtfeuerCompanyTimelineEvent;
 
 trait CompanySegmentTrait
 {
-    private function addCompanySegmentEvents(CompanyTimelineEvent $event, $eventType, $eventTypeName, $icon, $bundle = null, $object = null, $action = null, $contentTemplate = null): void
+    private function addCompanySegmentEvents(LeuchtfeuerCompanyTimelineEvent $event, $eventType, $eventTypeName, $icon, $bundle = null, $object = null, $action = null, $contentTemplate = null): void
     {
         $eventTypeName = $this->translator->trans($eventTypeName);
         $event->addEventType($eventType, $eventTypeName);
@@ -58,17 +58,6 @@ trait CompanySegmentTrait
                 '%action%'  => $action,
                 '%fromto%'  => $fromTo,
             ]);
-
-            //            $eventLabel = [
-            //                'label' => $eventSegmentLabelName,
-            //                'href'  => $this->router->generate(
-            //                    'mautic_company_segments_action',
-            //                    [
-            //                        'objectAction' => 'view',
-            //                        'objectId'     => $log['object_id'],
-            //                    ]
-            //                ),
-            //            ];
 
             $eventLabel = $eventSegmentLabelName;
 

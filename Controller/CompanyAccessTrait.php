@@ -1,9 +1,9 @@
 <?php
 
-namespace MauticPlugin\CompanyTimelineBundle\Controller;
+namespace MauticPlugin\LeuchtfeuerCompanyTimelineBundle\Controller;
 
 use Mautic\LeadBundle\Entity\Company;
-use MauticPlugin\CompanyTimelineBundle\Model\CustomCompanyEventLogModel;
+use MauticPlugin\LeuchtfeuerCompanyTimelineBundle\Model\CustomCompanyEventLogModel;
 use Symfony\Component\HttpFoundation\Response;
 
 trait CompanyAccessTrait
@@ -36,7 +36,7 @@ trait CompanyAccessTrait
                     [
                         'returnUrl'       => $returnUrl,
                         'viewParameters'  => ['page' => $page],
-                        'contentTemplate' => $isPlugin ? 'MauticPlugin\CompanyTimelineBundle\Controller\CompanyTimelineController::pluginIndexAction' : 'MauticPlugin\CompanyTimelineBundle\Controller\CompanyController::indexAction',
+                        'contentTemplate' => $isPlugin ? 'MauticPlugin\LeuchtfeuerCompanyTimelineBundle\Controller\CompanyTimelineController::pluginIndexAction' : 'MauticPlugin\LeuchtfeuerCompanyTimelineBundle\Controller\CompanyController::indexAction',
                         'passthroughVars' => [
                             'activeLink'    => $isPlugin ? '#mautic_plugin_timeline_index' : '#mautic_company_index',
                             'mauticContent' => 'CompanyTimeline',

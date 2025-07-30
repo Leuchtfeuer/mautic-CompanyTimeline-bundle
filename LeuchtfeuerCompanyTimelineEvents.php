@@ -1,8 +1,8 @@
 <?php
 
-namespace MauticPlugin\CompanyTimelineBundle;
+namespace MauticPlugin\LeuchtfeuerCompanyTimelineBundle;
 
-final class CompanyTimelineEvents
+final class LeuchtfeuerCompanyTimelineEvents
 {
     /**
      * The mautic.company_timeline_on_generate event is thrown to generate the company timeline.

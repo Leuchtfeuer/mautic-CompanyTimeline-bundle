@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MauticPlugin\CompanyTimelineBundle\Integration;
+namespace MauticPlugin\LeuchtfeuerCompanyTimelineBundle\Integration;
 
 use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
 use Mautic\IntegrationsBundle\Helper\IntegrationsHelper;
@@ -30,7 +30,7 @@ class Config
      */
     public function getIntegrationEntity(): Integration
     {
-        $integrationObject = $this->integrationsHelper->getIntegration(CompanyTimelineIntegration::INTEGRATION_NAME);
+        $integrationObject = $this->integrationsHelper->getIntegration(LeuchtfeuerCompanyTimelineIntegration::INTEGRATION_NAME);
 
         return $integrationObject->getIntegrationConfiguration();
     }

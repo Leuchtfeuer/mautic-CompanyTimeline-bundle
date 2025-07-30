@@ -1,6 +1,6 @@
 <?php
 
-namespace MauticPlugin\CompanyTimelineBundle\Event;
+namespace MauticPlugin\LeuchtfeuerCompanyTimelineBundle\Event;
 
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -13,7 +13,7 @@ use Symfony\Contracts\EventDispatcher\Event;
  *
  * This event is dispatched when a company timeline event occurs.
  */
-class CompanyTimelineEvent extends Event
+class LeuchtfeuerCompanyTimelineEvent extends Event
 {
     /**
      * Container with all filtered events.

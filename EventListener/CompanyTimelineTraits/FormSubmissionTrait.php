@@ -1,13 +1,13 @@
 <?php
 
-namespace MauticPlugin\CompanyTimelineBundle\EventListener\CompanyTimelineTraits;
+namespace MauticPlugin\LeuchtfeuerCompanyTimelineBundle\EventListener\CompanyTimelineTraits;
 
 use Mautic\LeadBundle\Entity\Lead;
-use MauticPlugin\CompanyTimelineBundle\Event\CompanyTimelineEvent;
+use MauticPlugin\LeuchtfeuerCompanyTimelineBundle\Event\LeuchtfeuerCompanyTimelineEvent;
 
 trait FormSubmissionTrait
 {
-    public function addFormsSubmittedEvent(CompanyTimelineEvent $event): void
+    public function addFormsSubmittedEvent(LeuchtfeuerCompanyTimelineEvent $event): void
     {
         $leads = $event->getLeads();
         foreach ($leads as $lead) {
@@ -20,7 +20,7 @@ trait FormSubmissionTrait
         }
     }
 
-    private function addFormSubmittedEvent(CompanyTimelineEvent $event, Lead $lead): void
+    private function addFormSubmittedEvent(LeuchtfeuerCompanyTimelineEvent $event, Lead $lead): void
     {
         // Set available event types
         $eventTypeKey  = 'form.submitted';

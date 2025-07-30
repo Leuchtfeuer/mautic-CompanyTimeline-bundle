@@ -1,10 +1,12 @@
 <?php
 
-namespace MauticPlugin\CompanyTimelineBundle\Tests\Functional\EventListener;
+namespace MauticPlugin\LeuchtfeuerCompanyTimelineBundle\Tests\Functional\EventListener;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use MauticPlugin\CompanyTimelineBundle\Tests\DefaultTraits\ActivePluginTrait;
+use Mautic\LeadBundle\Entity\Import;
 use MauticPlugin\LeuchtfeuerCompanySegmentsBundle\Model\CompanyEventLogModel;
+use MauticPlugin\LeuchtfeuerCompanyTimelineBundle\Tests\DefaultTraits\ActivePluginTrait;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class CompanyEventLogSubscriberTest extends MauticMysqlTestCase
 {
@@ -70,7 +72,6 @@ class CompanyEventLogSubscriberTest extends MauticMysqlTestCase
         $eventLog = $companyEventLogModel->getRepository()->findAll();
         foreach ($eventLog as $logEntry) {
             assert($logEntry instanceof \MauticPlugin\LeuchtfeuerCompanySegmentsBundle\Entity\CompanyEventLog);
-            //            dump($logEntry->getProperties(),$logEntry->getObject());
         }
         self::assertCount(2, $eventLog, 'Event log should contain two entries after adding tags to the company.');
 
@@ -107,5 +108,81 @@ class CompanyEventLogSubscriberTest extends MauticMysqlTestCase
         $this->assertTrue($this->client->getResponse()->isSuccessful(), 'Form submission should be successful.');
 
         return $this->em->getRepository(\Mautic\LeadBundle\Entity\Company::class)->findOneBy([], ['id' => 'DESC']);
+    }
+
+    public function testImportCompanyEventLog(): void
+    {
+        $eventLogModel     = self::getContainer()->get('mautic.company_segments.model.company_event_log');
+        $allEventLogBefore = $eventLogModel->getRepository()->findAll();
+        $companyModel      = self::getContainer()->get('mautic.lead.model.company');
+        assert($eventLogModel instanceof CompanyEventLogModel);
+        $companiesBefore = $companyModel->getRepository()->findAll();
+        $this->runCompanyCsv();
+        $this->runCompanyCsv();
+        $companiesLater   = $companyModel->getRepository()->findAll();
+        $allEventLogLater = $eventLogModel->getRepository()->findAll();
+        self::assertNotSame($companiesBefore, $companiesLater);
+        self::assertNotSame(count($allEventLogBefore), count($allEventLogLater), 'Event log should be updated after importing companies.');
+        $lastCompany = end($companiesLater);
+        $this->client->request('GET', '/s/companies/view/'.$lastCompany->getId());
+        self::assertStringContainsString('Company import from by', $this->client->getResponse()->getContent(), 'Company import event log should be present in the company view.');
+    }
+
+    private function runCompanyCsv(): void
+    {
+        $crawler    = $this->client->request('GET', '/s/companies/import/new');
+        $uploadForm = $crawler->selectButton('Upload')->form();
+        $file       = new UploadedFile(__DIR__.'/../../Fixtures/companies.csv', 'companies.csv', 'itext/csv');
+        $uploadForm['lead_import[file]']->setValue((string) $file);
+        $crawler                                        = $this->client->submit($uploadForm);
+        $mappingForm                                    = $crawler->selectButton('Import')->form();
+        $firstUser                                      = $this->em->getRepository(\Mautic\UserBundle\Entity\User::class)->findOneBy([], ['id' => 'ASC']);
+        $mappingForm['lead_field_import[company_name]'] = 'companyname';
+        $mappingForm['lead_field_import[company_name]'] = 'companyname';
+        $mappingForm['lead_field_import[owner]']        = $firstUser->getId();
+        $this->client->submit($mappingForm);
+        $imports    = $this->em->getRepository(Import::class)->findAll();
+        $lastImport = end($imports);
+        $this->em->clear();
+        $output = $this->testSymfonyCommand('mautic:import', ['-e' => 'dev', '--id' => $lastImport->getId(), '--limit' => 10000]);
+        self::assertStringContainsString('3 lines were processed', $output->getDisplay(), 'Import command should process 3 lines.');
+        $this->em->clear();
+    }
+
+    public function testAddRemoveLeadToCompany(): void
+    {
+        $eventLogModel = self::getContainer()->get('mautic.company_segments.model.company_event_log');
+        $companyModel  = self::getContainer()->get('mautic.lead.model.company');
+        assert($companyModel instanceof \Mautic\LeadBundle\Model\CompanyModel);
+        $leadModel = self::getContainer()->get('mautic.lead.model.lead');
+        assert($leadModel instanceof \Mautic\LeadBundle\Model\LeadModel);
+
+        $company = $this->createCompany('Test Company');
+        $lead    = $this->createLead('Test Lead');
+
+        // Add lead to company
+        $companyModel->addLeadToCompany($company, $lead);
+
+        $eventLogAfterAdd = $eventLogModel->getRepository()->findAll();
+        $companyModel->removeLeadFromCompany($company, $lead);
+        $eventLogAfterRemove = $eventLogModel->getRepository()->findAll();
+
+        self::assertNotSame(count($eventLogAfterAdd), count($eventLogAfterRemove));
+
+        $this->client->request('GET', '/s/companies/view/'.$company->getId());
+        self::assertStringContainsString('to added company.', $this->client->getResponse()->getContent(), 'Lead added event log should be present in the company view.');
+        self::assertStringContainsString('from removed company.', $this->client->getResponse()->getContent(), 'Lead added event log should be present in the company view.');
+    }
+
+    private function createLead(string $name): \Mautic\LeadBundle\Entity\Lead
+    {
+        $leadModel = self::getContainer()->get('mautic.lead.model.lead');
+        assert($leadModel instanceof \Mautic\LeadBundle\Model\LeadModel);
+        $lead = new \Mautic\LeadBundle\Entity\Lead();
+        $lead->setFirstname($name);
+        $lead->setEmail($name.'@example.com');
+        $leadModel->saveEntity($lead);
+
+        return $lead;
     }
 }

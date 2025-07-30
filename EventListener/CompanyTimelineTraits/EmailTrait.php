@@ -1,13 +1,13 @@
 <?php
 
-namespace MauticPlugin\CompanyTimelineBundle\EventListener\CompanyTimelineTraits;
+namespace MauticPlugin\LeuchtfeuerCompanyTimelineBundle\EventListener\CompanyTimelineTraits;
 
 use Mautic\LeadBundle\Entity\Lead;
-use MauticPlugin\CompanyTimelineBundle\Event\CompanyTimelineEvent;
+use MauticPlugin\LeuchtfeuerCompanyTimelineBundle\Event\LeuchtfeuerCompanyTimelineEvent;
 
 trait EmailTrait
 {
-    private function addEmailsEvent(CompanyTimelineEvent $event): void
+    private function addEmailsEvent(LeuchtfeuerCompanyTimelineEvent $event): void
     {
         $leads = $event->getLeads();
         foreach ($leads as $lead) {
@@ -26,7 +26,7 @@ trait EmailTrait
         }
     }
 
-    private function addEmailEvents(Lead $lead, CompanyTimelineEvent $event, $state): void
+    private function addEmailEvents(Lead $lead, LeuchtfeuerCompanyTimelineEvent $event, $state): void
     {
         // Set available event types
         $eventTypeKey  = 'company.email.'.$state;

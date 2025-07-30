@@ -1,17 +1,16 @@
 <?php
 
-namespace MauticPlugin\CompanyTimelineBundle\Model;
+namespace MauticPlugin\LeuchtfeuerCompanyTimelineBundle\Model;
 
 use Doctrine\DBAL\ArrayParameterType;
-use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyLead;
 use Mautic\LeadBundle\Entity\Lead;
-use MauticPlugin\CompanyTimelineBundle\CompanyTimelineEvents;
-use MauticPlugin\CompanyTimelineBundle\Event\CompanyTimelineEvent;
 use MauticPlugin\LeuchtfeuerCompanySegmentsBundle\Entity\CompanyEventLog;
 use MauticPlugin\LeuchtfeuerCompanySegmentsBundle\Model\CompanyEventLogModel as BaseCompanyEventLogModel;
 use MauticPlugin\LeuchtfeuerCompanyTagsBundle\Entity\CompanyTags;
+use MauticPlugin\LeuchtfeuerCompanyTimelineBundle\Event\LeuchtfeuerCompanyTimelineEvent;
+use MauticPlugin\LeuchtfeuerCompanyTimelineBundle\LeuchtfeuerCompanyTimelineEvents;
 
 class CustomCompanyEventLogModel extends BaseCompanyEventLogModel
 {
@@ -29,8 +28,8 @@ class CustomCompanyEventLogModel extends BaseCompanyEventLogModel
             $leads   = $this->em->getRepository(Lead::class)->getEntities(['ids' => $leadsId, 'ignore_paginator' => false]);
         }
         $event = $this->dispatcher->dispatch(
-            new CompanyTimelineEvent($company, $filters, $orderBy, $page, $limit, $forTimeline, $this->coreParametersHelper->get('site_url'), $leads),
-            CompanyTimelineEvents::TIMELINE_ON_GENERATE
+            new LeuchtfeuerCompanyTimelineEvent($company, $filters, $orderBy, $page, $limit, $forTimeline, $this->coreParametersHelper->get('site_url'), $leads),
+            LeuchtfeuerCompanyTimelineEvents::TIMELINE_ON_GENERATE
         );
 
         $payload = [
@@ -47,15 +46,12 @@ class CustomCompanyEventLogModel extends BaseCompanyEventLogModel
         return ($forTimeline) ? $payload : [$payload, $event->getSerializerGroups()];
     }
 
-    /**
-     * @return array
-     */
     public function getEngagementTypes(): array
     {
-        $event = new CompanyTimelineEvent();
+        $event = new LeuchtfeuerCompanyTimelineEvent();
         $event->fetchTypesOnly();
 
-        $this->dispatcher->dispatch($event, CompanyTimelineEvents::TIMELINE_ON_GENERATE);
+        $this->dispatcher->dispatch($event, LeuchtfeuerCompanyTimelineEvents::TIMELINE_ON_GENERATE);
 
         return $event->getEventTypes();
     }
@@ -195,8 +191,13 @@ class CustomCompanyEventLogModel extends BaseCompanyEventLogModel
         $companyEventLog->setAction($log['action']);
         $companyEventLog->setObject($log['object']);
         $companyEventLog->setObjectId($log['objectId'] ?? 0);
-
-        $companyEventLog->setDateAdded($log['date_added']->getDateModified() ?? new \DateTime());
+        if (!array_key_exists('date_added', $log)) {
+            $log['date_added'] = new \DateTime();
+        }
+        if (!($log['date_added'] instanceof \DateTime)) {
+            $log['date_added'] = new \DateTime();
+        }
+        $companyEventLog->setDateAdded($log['date_added']);
         $userId      = null; // Set the user ID if available
         $userName    = 'System'; // or use the actual user name if available
         $currentUser = $this->userHelper->getUser();

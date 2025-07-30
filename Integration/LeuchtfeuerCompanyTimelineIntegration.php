@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace MauticPlugin\CompanyTimelineBundle\Integration;
+namespace MauticPlugin\LeuchtfeuerCompanyTimelineBundle\Integration;
 
 use Mautic\IntegrationsBundle\Integration\BasicIntegration;
 use Mautic\IntegrationsBundle\Integration\ConfigurationTrait;
 use Mautic\IntegrationsBundle\Integration\Interfaces\BasicInterface;
 
-class CompanyTimelineIntegration extends BasicIntegration implements BasicInterface
+class LeuchtfeuerCompanyTimelineIntegration extends BasicIntegration implements BasicInterface
 {
     use ConfigurationTrait;
 

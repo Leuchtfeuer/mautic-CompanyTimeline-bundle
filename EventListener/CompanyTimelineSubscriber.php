@@ -1,6 +1,6 @@
 <?php
 
-namespace MauticPlugin\CompanyTimelineBundle\EventListener;
+namespace MauticPlugin\LeuchtfeuerCompanyTimelineBundle\EventListener;
 
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\Factory\ModelFactory;
@@ -9,19 +9,23 @@ use Mautic\EmailBundle\Model\EmailStatModel;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\FormBundle\Model\SubmissionModel;
 use Mautic\LeadBundle\Model\CompanyModel;
+use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Model\PageModel;
-use MauticPlugin\CompanyTimelineBundle\CompanyTimelineEvents;
-use MauticPlugin\CompanyTimelineBundle\Event\CompanyTimelineEvent;
-use MauticPlugin\CompanyTimelineBundle\EventListener\CompanyTimelineTraits\AssestDownloadTrait;
-use MauticPlugin\CompanyTimelineBundle\EventListener\CompanyTimelineTraits\CompanySegmentTrait;
-use MauticPlugin\CompanyTimelineBundle\EventListener\CompanyTimelineTraits\CompanyTagsTrait;
-use MauticPlugin\CompanyTimelineBundle\EventListener\CompanyTimelineTraits\CompanyTrait;
-use MauticPlugin\CompanyTimelineBundle\EventListener\CompanyTimelineTraits\EmailTrait;
-use MauticPlugin\CompanyTimelineBundle\EventListener\CompanyTimelineTraits\FormSubmissionTrait;
-use MauticPlugin\CompanyTimelineBundle\EventListener\CompanyTimelineTraits\PageHitTrait;
-use MauticPlugin\CompanyTimelineBundle\Model\CustomCompanyEventLogModel;
 use MauticPlugin\LeuchtfeuerCompanySegmentsBundle\Model\CompanySegmentModel;
 use MauticPlugin\LeuchtfeuerCompanyTagsBundle\Model\CompanyTagModel;
+use MauticPlugin\LeuchtfeuerCompanyTimelineBundle\Event\LeuchtfeuerCompanyTimelineEvent;
+use MauticPlugin\LeuchtfeuerCompanyTimelineBundle\EventListener\CompanyTimelineTraits\AssestDownloadTrait;
+use MauticPlugin\LeuchtfeuerCompanyTimelineBundle\EventListener\CompanyTimelineTraits\CompanyImportTrait;
+use MauticPlugin\LeuchtfeuerCompanyTimelineBundle\EventListener\CompanyTimelineTraits\CompanyPointTrait;
+use MauticPlugin\LeuchtfeuerCompanyTimelineBundle\EventListener\CompanyTimelineTraits\CompanySegmentTrait;
+use MauticPlugin\LeuchtfeuerCompanyTimelineBundle\EventListener\CompanyTimelineTraits\CompanyTagsTrait;
+use MauticPlugin\LeuchtfeuerCompanyTimelineBundle\EventListener\CompanyTimelineTraits\CompanyTrait;
+use MauticPlugin\LeuchtfeuerCompanyTimelineBundle\EventListener\CompanyTimelineTraits\EmailTrait;
+use MauticPlugin\LeuchtfeuerCompanyTimelineBundle\EventListener\CompanyTimelineTraits\FormSubmissionTrait;
+use MauticPlugin\LeuchtfeuerCompanyTimelineBundle\EventListener\CompanyTimelineTraits\LeadCompanyEventsTrait;
+use MauticPlugin\LeuchtfeuerCompanyTimelineBundle\EventListener\CompanyTimelineTraits\PageHitTrait;
+use MauticPlugin\LeuchtfeuerCompanyTimelineBundle\LeuchtfeuerCompanyTimelineEvents;
+use MauticPlugin\LeuchtfeuerCompanyTimelineBundle\Model\CustomCompanyEventLogModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -35,6 +39,9 @@ class CompanyTimelineSubscriber implements EventSubscriberInterface
     use AssestDownloadTrait;
     use EmailTrait;
     use FormSubmissionTrait;
+    use LeadCompanyEventsTrait;
+    use CompanyPointTrait;
+    use CompanyImportTrait;
 
     public function __construct(
         private CustomCompanyEventLogModel $customCompanyEventLogModel,
@@ -49,32 +56,37 @@ class CompanyTimelineSubscriber implements EventSubscriberInterface
         private FormModel $formModel,
         private PageModel $pageModel,
         private ModelFactory $modelFactory,
+        private LeadModel $leadModel,
     ) {
     }
 
     public static function getSubscribedEvents(): array
     {
         return [
-            CompanyTimelineEvents::TIMELINE_ON_GENERATE => ['onTimelineGenerate', 0],
+            LeuchtfeuerCompanyTimelineEvents::TIMELINE_ON_GENERATE => ['onTimelineGenerate', 0],
         ];
     }
 
     /**
      * Compile events for the lead timeline.
      */
-    public function onTimelineGenerate(CompanyTimelineEvent $event): void
+    public function onTimelineGenerate(LeuchtfeuerCompanyTimelineEvent $event): void
     {
         $eventTypes = [
-            'company.created'       => 'mautic.company_timeline.timeline.company.created',
-            'company.segmentadd'    => 'mautic.company_timeline.timeline.segment.add',
-            'company.segmentremove' => 'mautic.company_timeline.timeline.segment.remove',
-            'company.tagadd'        => 'mautic.company_timeline.timeline.companytag.add',
-            'company.tagremove'     => 'mautic.company_timeline.timeline.companytag.remove',
+            'company.created'        => 'mautic.company_timeline.timeline.company.created',
+            'company.segmentadd'     => 'mautic.company_timeline.timeline.segment.add',
+            'company.segmentremove'  => 'mautic.company_timeline.timeline.segment.remove',
+            'company.tagadd'         => 'mautic.company_timeline.timeline.companytag.add',
+            'company.tagremove'      => 'mautic.company_timeline.timeline.companytag.remove',
+            'company.points'         => 'mautic.company_timeline.timeline.company.points',
+            'company.import'         => 'mautic.company_timeline.timeline.company.imported',
             // event to leads
-            'lead.asset.download'         => 'mautic.asset.event.download',
-            'lead.company.email'          => 'mautic.company_timeline.timeline.company.added',
-            'lead.form.company.submitted' => 'mautic.company_timeline.timeline.company.form.submitted',
-            'lead.company.page.hit'       => 'mautic.page.event.hit',
+            'lead.asset.download'          => 'mautic.asset.event.download',
+            'lead.company.email'           => 'mautic.company_timeline.timeline.company.added',
+            'lead.form.company.submitted'  => 'mautic.company_timeline.timeline.company.form.submitted',
+            'lead.company.page.hit'        => 'mautic.page.event.hit',
+            'lead.added'                   => 'mautic.company_timeline.timeline.contact.added',
+            'lead.removed'                 => 'mautic.company_timeline.timeline.contact.removed',
         ];
 
         $event->getEventFilters();
@@ -124,11 +136,81 @@ class CompanyTimelineSubscriber implements EventSubscriberInterface
                 case 'lead.company.page.hit':
                     $this->timelinePageHit($event);
                     break;
+
+                case 'lead.added':
+                    $this->addLeadToCompany($event, $type);
+                    break;
+                case 'lead.removed':
+                    $this->removeLeadFromCompany(
+                        $event,
+                        $type
+                    );
+                    break;
+                case 'company.points':
+                    $this->timelineCompanyPoints($event, $type);
+                    break;
+
+                case 'company.import':
+                    $this->addCompanyImportedEvent(
+                        $event,
+                        $type,
+                    );
+                    break;
             }
         }
     }
 
-    private function timelineTagAdded(CompanyTimelineEvent $event, string $eventType): void
+    private function addCompanyImportedEvent(LeuchtfeuerCompanyTimelineEvent $event, string $eventType): void
+    {
+        $this->addCompanyImportUpdate(
+            $event,
+            $eventType,
+            'ri-import-fill',
+        );
+    }
+
+    private function timelineCompanyPoints(LeuchtfeuerCompanyTimelineEvent $event, string $eventType): void
+    {
+        $this->addChangePoints(
+            $event,
+            $eventType,
+            'ri-checkbox-fill',
+        );
+    }
+
+    /**
+     * Add a lead to the company timeline.
+     */
+    private function removeLeadFromCompany(LeuchtfeuerCompanyTimelineEvent $event, string $eventType): void
+    {
+        $this->addLeadAdded(
+            $event,
+            $eventType,
+            'mautic.company_timeline.timeline.contact.removed',
+            'ri-add-box-fill',
+            'company',
+            'lead',
+            'removed',
+        );
+    }
+
+    /**
+     * Add a company tag event to the timeline.
+     */
+    private function addLeadToCompany(LeuchtfeuerCompanyTimelineEvent $event, string $eventType): void
+    {
+        $this->addLeadAdded(
+            $event,
+            $eventType,
+            'mautic.company_timeline.timeline.contact.added',
+            'ri-add-box-fill',
+            'company',
+            'lead',
+            'added',
+        );
+    }
+
+    private function timelineTagAdded(LeuchtfeuerCompanyTimelineEvent $event, string $eventType): void
     {
         $this->timelineTag(
             $event,
@@ -137,7 +219,7 @@ class CompanyTimelineSubscriber implements EventSubscriberInterface
         );
     }
 
-    private function timelineTagRemoved(CompanyTimelineEvent $event, string $eventType): void
+    private function timelineTagRemoved(LeuchtfeuerCompanyTimelineEvent $event, string $eventType): void
     {
         $this->timelineTag(
             $event,
@@ -146,7 +228,7 @@ class CompanyTimelineSubscriber implements EventSubscriberInterface
         );
     }
 
-    private function timelineTag(CompanyTimelineEvent $event, string $eventType, string $action): void
+    private function timelineTag(LeuchtfeuerCompanyTimelineEvent $event, string $eventType, string $action): void
     {
         $this->addCompanyTagsEvent(
             $event,
@@ -159,7 +241,7 @@ class CompanyTimelineSubscriber implements EventSubscriberInterface
         );
     }
 
-    private function timelineSegmentAdd(CompanyTimelineEvent $event, string $eventType): void
+    private function timelineSegmentAdd(LeuchtfeuerCompanyTimelineEvent $event, string $eventType): void
     {
         $this->addCompanySegmentEvents(
             $event,
@@ -172,7 +254,7 @@ class CompanyTimelineSubscriber implements EventSubscriberInterface
         );
     }
 
-    private function timelineSegmentRemove(CompanyTimelineEvent $event, string $eventType): void
+    private function timelineSegmentRemove(LeuchtfeuerCompanyTimelineEvent $event, string $eventType): void
     {
         $this->addCompanySegmentEvents(
             $event,
@@ -185,7 +267,7 @@ class CompanyTimelineSubscriber implements EventSubscriberInterface
         );
     }
 
-    private function timelineCompanyCreated(CompanyTimelineEvent $event, string $eventType): void
+    private function timelineCompanyCreated(LeuchtfeuerCompanyTimelineEvent $event, string $eventType): void
     {
         $this->addCompanyCreatedEvent(
             $event,
@@ -194,22 +276,22 @@ class CompanyTimelineSubscriber implements EventSubscriberInterface
         );
     }
 
-    private function timelineAssetDownload(CompanyTimelineEvent $event, string $type, string $name): void
+    private function timelineAssetDownload(LeuchtfeuerCompanyTimelineEvent $event, string $type, string $name): void
     {
         $this->addLeadsAssetDownload($event, $type, $name, 'ri-add-box-fill');
     }
 
-    private function timelineEmails(CompanyTimelineEvent $event): void
+    private function timelineEmails(LeuchtfeuerCompanyTimelineEvent $event): void
     {
         $this->addEmailsEvent($event);
     }
 
-    private function timelineFormSubmission(CompanyTimelineEvent $event): void
+    private function timelineFormSubmission(LeuchtfeuerCompanyTimelineEvent $event): void
     {
         $this->addFormsSubmittedEvent($event);
     }
 
-    private function timelinePageHit(CompanyTimelineEvent $event): void
+    private function timelinePageHit(LeuchtfeuerCompanyTimelineEvent $event): void
     {
         $this->addCompanyLeadsPageHits(
             $event,

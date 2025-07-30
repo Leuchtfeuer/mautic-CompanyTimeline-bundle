@@ -1,14 +1,14 @@
 <?php
 
-namespace MauticPlugin\CompanyTimelineBundle\EventListener\CompanyTimelineTraits;
+namespace MauticPlugin\LeuchtfeuerCompanyTimelineBundle\EventListener\CompanyTimelineTraits;
 
 use Mautic\LeadBundle\Entity\Lead;
-use MauticPlugin\CompanyTimelineBundle\Event\CompanyTimelineEvent;
+use MauticPlugin\LeuchtfeuerCompanyTimelineBundle\Event\LeuchtfeuerCompanyTimelineEvent;
 
 trait AssestDownloadTrait
 {
     private function addLeadsAssetDownload(
-        CompanyTimelineEvent $event,
+        LeuchtfeuerCompanyTimelineEvent $event,
         string $eventType,
         string $eventTypeName,
         string $icon,
@@ -34,12 +34,10 @@ trait AssestDownloadTrait
         }
     }
 
-    private function addAssetDownload(Lead $lead, CompanyTimelineEvent $event, string $eventType, string $eventTypeName): void
+    private function addAssetDownload(Lead $lead, LeuchtfeuerCompanyTimelineEvent $event, string $eventType, string $eventTypeName): void
     {
         $leadId    = $lead->getId();
         $downloads = $this->assetModel->getDownloadRepository()->getLeadDownloads($leadId, $event->getQueryOptions());
-
-        //        $downloads = $this->downloadRepository->getLeadDownloads($event->getLeadId(), $event->getQueryOptions());
 
         // Add total number to counter
         $event->addToCounter($eventType, $downloads);

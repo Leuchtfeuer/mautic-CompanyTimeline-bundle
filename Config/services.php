@@ -15,9 +15,9 @@ return function (ContainerConfigurator $configurator): void {
     $excludes = [
     ];
 
-    $services->load('MauticPlugin\\CompanyTimelineBundle\\', '../')
+    $services->load('MauticPlugin\\LeuchtfeuerCompanyTimelineBundle\\', '../')
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
-    $services->alias('mautic.company_timeline.model.custom_company_event_log', MauticPlugin\CompanyTimelineBundle\Model\CustomCompanyEventLogModel::class);
+    $services->alias('mautic.company_timeline.model.custom_company_event_log', MauticPlugin\LeuchtfeuerCompanyTimelineBundle\Model\CustomCompanyEventLogModel::class);
     $services->alias('mautic.email.model.stat', Mautic\EmailBundle\Model\EmailStatModel::class);
 };

@@ -1,6 +1,6 @@
 <?php
 
-namespace MauticPlugin\CompanyTimelineBundle\EventListener;
+namespace MauticPlugin\LeuchtfeuerCompanyTimelineBundle\EventListener;
 
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\RouteEvent;
@@ -17,13 +17,12 @@ class RouteSubscriber implements EventSubscriberInterface
 
     public function onBuildRoute(RouteEvent $event): void
     {
-        //        dd('The mautic_company_action route is already defined. Please remove the CompanyTimelineBundle plugin to avoid conflicts.');
         $routes = $event->getCollection()->all();
 
         if ('main' === $event->getType() && isset($routes['mautic_company_action'])) {
             $route = $routes['mautic_company_action'];
             assert($route instanceof \Symfony\Component\Routing\Route);
-            $route->setDefault('_controller', 'MauticPlugin\CompanyTimelineBundle\Controller\CompanyController::executeAction');
+            $route->setDefault('_controller', 'MauticPlugin\LeuchtfeuerCompanyTimelineBundle\Controller\CompanyController::executeAction');
             $event->getCollection()->remove('mautic_company_action');
             $event->getCollection()->add('mautic_company_action', $route);
         }

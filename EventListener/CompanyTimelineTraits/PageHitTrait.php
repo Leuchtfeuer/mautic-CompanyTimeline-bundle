@@ -1,17 +1,17 @@
 <?php
 
-namespace MauticPlugin\CompanyTimelineBundle\EventListener\CompanyTimelineTraits;
+namespace MauticPlugin\LeuchtfeuerCompanyTimelineBundle\EventListener\CompanyTimelineTraits;
 
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\ChannelTimelineInterface;
-use MauticPlugin\CompanyTimelineBundle\Event\CompanyTimelineEvent;
+use MauticPlugin\LeuchtfeuerCompanyTimelineBundle\Event\LeuchtfeuerCompanyTimelineEvent;
 
 trait PageHitTrait
 {
     /**
      * Compile events for the lead timeline.
      */
-    public function addCompanyLeadsPageHits(CompanyTimelineEvent $event): void
+    public function addCompanyLeadsPageHits(LeuchtfeuerCompanyTimelineEvent $event): void
     {
         // Set available event types
         $eventTypeKey  = 'company.page.hit';
@@ -35,9 +35,8 @@ trait PageHitTrait
         }
     }
 
-    private function addPageHits(CompanyTimelineEvent $event, Lead $lead, string $eventTypeKey, string $eventTypeName): void
+    private function addPageHits(LeuchtfeuerCompanyTimelineEvent $event, Lead $lead, string $eventTypeKey, string $eventTypeName): void
     {
-        //        dd($event->getQueryOptions());
         $queryOptions           = $event->getQueryOptions();
         $queryOptions['leadId'] = $lead->getId();
         $hits                   = $this->pageModel->getHitRepository()->getLeadHits(

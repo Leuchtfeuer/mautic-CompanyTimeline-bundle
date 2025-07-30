@@ -1,13 +1,13 @@
 <?php
 
-namespace MauticPlugin\CompanyTimelineBundle\EventListener\CompanyTimelineTraits;
+namespace MauticPlugin\LeuchtfeuerCompanyTimelineBundle\EventListener\CompanyTimelineTraits;
 
-use MauticPlugin\CompanyTimelineBundle\Event\CompanyTimelineEvent;
+use MauticPlugin\LeuchtfeuerCompanyTimelineBundle\Event\LeuchtfeuerCompanyTimelineEvent;
 
 trait CompanyTagsTrait
 {
     private function addCompanyTagsEvent(
-        CompanyTimelineEvent $event,
+        LeuchtfeuerCompanyTimelineEvent $event,
         $eventType,
         $eventTypeName,
         $icon,

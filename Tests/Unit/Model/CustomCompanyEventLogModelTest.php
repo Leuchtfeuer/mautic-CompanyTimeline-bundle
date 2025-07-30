@@ -1,29 +1,25 @@
 <?php
 
-namespace MauticPlugin\CompanyTimelineBundle\Tests\Unit\Model;
+namespace MauticPlugin\LeuchtfeuerCompanyTimelineBundle\Tests\Unit\Model;
 
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
-use Mautic\LeadBundle\Entity\CompanyLeadRepository;
-use PHPUnit\Framework\TestCase;
-use MauticPlugin\CompanyTimelineBundle\Model\CustomCompanyEventLogModel;
-use Doctrine\ORM\EntityManagerInterface;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Mautic\LeadBundle\Entity\Company;
-use Mautic\LeadBundle\Entity\CompanyLead;
+use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\Lead;
-use MauticPlugin\LeuchtfeuerCompanySegmentsBundle\Entity\CompanyEventLog;
-use MauticPlugin\LeuchtfeuerCompanyTagsBundle\Entity\CompanyTags;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Mautic\CoreBundle\Helper\UserHelper;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use MauticPlugin\CompanyTimelineBundle\Event\CompanyTimelineEvent;
 use MauticPlugin\LeuchtfeuerCompanySegmentsBundle\Entity\CompanyEventLogRepository;
-use Doctrine\Persistence\ManagerRegistry;
-
+use MauticPlugin\LeuchtfeuerCompanyTagsBundle\Entity\CompanyTags;
+use MauticPlugin\LeuchtfeuerCompanyTimelineBundle\Model\CustomCompanyEventLogModel;
+use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class CustomCompanyEventLogModelTest extends TestCase
 {
@@ -37,11 +33,10 @@ class CustomCompanyEventLogModelTest extends TestCase
     private $translator;
     private $logger;
 
-
     protected function setUp(): void
     {
-        $this->em = $this->createMock(EntityManagerInterface::class);
-        $connectionMock = $this->createMock(\Doctrine\DBAL\Connection::class);
+        $this->em         = $this->createMock(EntityManagerInterface::class);
+        $connectionMock   = $this->createMock(\Doctrine\DBAL\Connection::class);
         $queryBuilderMock = $this->getMockBuilder(\Doctrine\DBAL\Query\QueryBuilder::class)
             ->setConstructorArgs([$connectionMock])
             ->getMock();
@@ -59,15 +54,15 @@ class CustomCompanyEventLogModelTest extends TestCase
 
         $this->em->method('getConnection')->willReturn($connectionMock);
         $this->dispatcher = $this->createMock(EventDispatcherInterface::class);
-        $this->security = $this->createMock(CorePermissions::class);
-        $this->router = $this->createMock(UrlGeneratorInterface::class);
+        $this->security   = $this->createMock(CorePermissions::class);
+        $this->router     = $this->createMock(UrlGeneratorInterface::class);
         $this->translator = $this->createMock(Translator::class);
-        $this->logger = $this->createMock(LoggerInterface::class);
-        $tokenStorage = $this->createMock(TokenStorageInterface::class);
+        $this->logger     = $this->createMock(LoggerInterface::class);
+        $tokenStorage     = $this->createMock(TokenStorageInterface::class);
         $this->userHelper = $this->getMockBuilder(UserHelper::class)
             ->setConstructorArgs([$tokenStorage]) // Pass required argument(s)
             ->getMock();
-        $ContainerInterface = $this->createMock(ContainerInterface::class);
+        $ContainerInterface         = $this->createMock(ContainerInterface::class);
         $this->coreParametersHelper = $this->getMockBuilder(CoreParametersHelper::class)
             ->setConstructorArgs([$ContainerInterface]) // Pass required argument(s)
             ->getMock();
@@ -81,7 +76,7 @@ class CustomCompanyEventLogModelTest extends TestCase
                 $this->translator,
                 $this->userHelper,
                 $this->logger,
-                $this->coreParametersHelper
+                $this->coreParametersHelper,
             ])
             ->onlyMethods(['getRepository', 'getTimelineResults', 'saveEntity'])
             ->getMock();
@@ -110,7 +105,7 @@ class CustomCompanyEventLogModelTest extends TestCase
         $this->dispatcher->method('dispatch')->willReturn($eventMock);
         $this->coreParametersHelper->method('get')->willReturn('http://localhost');
 
-        $result = $this->model->getEngagements($company,[]);
+        $result = $this->model->getEngagements($company, []);
 
         $this->assertIsArray($result);
         $this->assertArrayHasKey('events', $result);
@@ -135,7 +130,7 @@ class CustomCompanyEventLogModelTest extends TestCase
         $company = $this->createMock(Company::class);
         $company->method('getId')->willReturn(1);
         $managerRegistry = $this->createMock(ManagerRegistry::class);
-        $repoMock = $this->getMockBuilder(CompanyEventLogRepository::class)
+        $repoMock        = $this->getMockBuilder(CompanyEventLogRepository::class)
             ->setConstructorArgs([$managerRegistry])
             ->getMock();
 
@@ -184,13 +179,13 @@ class CustomCompanyEventLogModelTest extends TestCase
         $this->model->expects($this->once())->method('saveEntity');
 
         $log = [
-            'company' => $company,
-            'bundle' => 'company',
-            'action' => 'added',
-            'object' => 'company_tag',
-            'objectId' => 2,
+            'company'    => $company,
+            'bundle'     => 'company',
+            'action'     => 'added',
+            'object'     => 'company_tag',
+            'objectId'   => 2,
             'date_added' => $company,
-            'details' => ['foo' => 'bar'],
+            'details'    => ['foo' => 'bar'],
         ];
 
         $this->model->writeToLog($log);

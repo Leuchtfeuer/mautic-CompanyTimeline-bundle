@@ -1,6 +1,6 @@
 <?php
 
-namespace MauticPlugin\CompanyTimelineBundle\Controller;
+namespace MauticPlugin\LeuchtfeuerCompanyTimelineBundle\Controller;
 
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Factory\MauticFactory;
@@ -13,11 +13,11 @@ use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Model\CompanyModel;
-use MauticPlugin\CompanyTimelineBundle\Integration\Config;
-use MauticPlugin\CompanyTimelineBundle\Model\CustomCompanyEventLogModel;
 use MauticPlugin\LeuchtfeuerCompanyTagsBundle\Controller\CompanyController as CompanyTagsController;
 use MauticPlugin\LeuchtfeuerCompanyTagsBundle\Integration\Config as CompanyTagsConfig;
 use MauticPlugin\LeuchtfeuerCompanyTagsBundle\Model\CompanyTagModel;
+use MauticPlugin\LeuchtfeuerCompanyTimelineBundle\Integration\Config;
+use MauticPlugin\LeuchtfeuerCompanyTimelineBundle\Model\CustomCompanyEventLogModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -158,7 +158,7 @@ class CompanyController extends CompanyTagsController
                     'limit'             => $contacts['limit'],
                     'events'            => $this->getCompanyEngagements($company),
                 ],
-                'contentTemplate'        => '@CompanyTimeline/Company/company.html.twig',
+                'contentTemplate'        => '@LeuchtfeuerCompanyTimeline/Company/company.html.twig',
                 'passthroughVars'        => [
                     'activeLink'    => '#mautic_company_index',
                     'mauticContent' => 'leadTimeline',
