@@ -16,13 +16,13 @@ return [
                     'mautic.basic_integration',
                 ],
             ],
-            'mautic.integration.companytimeline.configuration' => [
+            'mautic.integration.leuchtfeuercompanytimeline.configuration' => [
                 'class' => MauticPlugin\LeuchtfeuerCompanyTimelineBundle\Integration\Support\ConfigSupport::class,
                 'tags'  => [
                     'mautic.config_integration',
                 ],
             ],
-            'mautic.integration.companytimeline.config' => [
+            'mautic.integration.leuchtfeuercompanytimeline.config' => [
                 'class' => MauticPlugin\LeuchtfeuerCompanyTimelineBundle\Integration\Config::class,
                 'tags'  => [
                     'mautic.integrations.helper',

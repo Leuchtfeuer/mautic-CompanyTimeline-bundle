@@ -1,4 +1,4 @@
-Here is a sample `README.md` for `plugins/CompanyTimelineBundle`, modeled after the structure and style typically found in `plugins/LeuchfeuerCompanySegment/Readme`.
+Here is a sample `README.md` for `plugins/LeuchtfeuerCompanyTimelineBundle`, modeled after the structure and style typically found in `plugins/LeuchfeuerCompanySegment/Readme`.
 
 ---
 
@@ -16,7 +16,7 @@ The **CompanyTimelineBundle** plugin adds timeline functionality for company ent
 
 ## Installation
 
-1. Copy the `CompanyTimelineBundle` folder to your Mautic `plugins` directory.
+1. Copy the `LeuchtfeuerCompanyTimelineBundle` folder to your Mautic `plugins` directory.
 2. Clear the cache:
    ```
    php bin/console cache:clear

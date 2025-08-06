@@ -12,7 +12,7 @@ class LeuchtfeuerCompanyTimelineIntegration extends BasicIntegration implements 
 {
     use ConfigurationTrait;
 
-    public const INTEGRATION_NAME = 'companytimeline';
+    public const INTEGRATION_NAME = 'leuchtfeuercompanytimeline';
     public const DISPLAY_NAME     = 'Add a detailed history tab for Companies';
 
     public function getName(): string
@@ -27,6 +27,6 @@ class LeuchtfeuerCompanyTimelineIntegration extends BasicIntegration implements 
 
     public function getIcon(): string
     {
-        return 'plugins/CompanyTimelineBundle/Assets/img/icon.png';
+        return 'plugins/LeuchtfeuerCompanyTimelineBundle/Assets/img/icon.png';
     }
 }

@@ -14,7 +14,7 @@ trait ActivePluginTrait
         $this->client->request('GET', '/s/plugins/reload');
 
         // Install Company Tags
-        $this->installPlugin('CompanyTimelineBundle');
+        $this->installPlugin('LeuchtfeuerCompanyTimelineBundle');
 
         // Install Company Event Log
         $this->installPlugin('LeuchtfeuerCompanyEventLogBundle');
