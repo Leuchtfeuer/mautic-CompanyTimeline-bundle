@@ -1,7 +1,3 @@
-Here is a sample `README.md` for `plugins/LeuchtfeuerCompanyTimelineBundle`, modeled after the structure and style typically found in `plugins/LeuchfeuerCompanySegment/Readme`.
-
----
-
 # CompanyTimelineBundle
 
 ## Overview
@@ -41,7 +37,3 @@ For issues or feature requests, please open an issue in the [Mautic GitHub repos
 ## License
 
 This plugin is released under the MIT License.
-
----
-
-Replace or expand sections as needed for your specific implementation.

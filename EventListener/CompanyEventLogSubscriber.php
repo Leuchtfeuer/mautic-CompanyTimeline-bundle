@@ -13,6 +13,7 @@ use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\UserBundle\Model\UserModel;
 use MauticPlugin\LeuchtfeuerCompanyTagsBundle\Event\CompanyTagsEvent;
 use MauticPlugin\LeuchtfeuerCompanyTagsBundle\LeuchtfeuerCompanyTagsEvents;
+use MauticPlugin\LeuchtfeuerCompanyTimelineBundle\Integration\Config;
 use MauticPlugin\LeuchtfeuerCompanyTimelineBundle\Model\CustomCompanyEventLogModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -22,12 +23,13 @@ class CompanyEventLogSubscriber implements EventSubscriberInterface
         private CustomCompanyEventLogModel $customCompanyEventLogModel,
         private IpLookupHelper $ipLookupHelper,
         protected CompanyDeduper $companyDeduper,
-        private readonly UserModel $userModel,
+        private UserModel $userModel,
+        private Config $config,
     ) {
         // Constructor logic if needed
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             LeadEvents::IMPORT_ON_PROCESS       => ['onImportProcess', 200],
@@ -46,6 +48,10 @@ class CompanyEventLogSubscriber implements EventSubscriberInterface
 
     public function onLeadChangedCompany(LeadChangeCompanyEvent $event): void
     {
+        if (!$this->config->isPublished()) {
+            return;
+        }
+
         $company = $event->getCompany();
         $leads   = $event->getLeads();
         if (null === $leads && null !== $event->getLead()) {
@@ -82,6 +88,10 @@ class CompanyEventLogSubscriber implements EventSubscriberInterface
 
     public function onCompanyTagPosUpdate(CompanyTagsEvent $event): void
     {
+        if (!$this->config->isPublished()) {
+            return;
+        }
+
         $this->customCompanyEventLogModel->saveCompanyEventLogOfCompanyTags(
             $event->getCompany(),
             $event->getTags()
@@ -90,6 +100,10 @@ class CompanyEventLogSubscriber implements EventSubscriberInterface
 
     public function onCompanyPointsChanged(CompanyEvent $event): void
     {
+        if (!$this->config->isPublished()) {
+            return;
+        }
+
         if (!$event->getCompany()) {
             return;
         }
@@ -114,18 +128,24 @@ class CompanyEventLogSubscriber implements EventSubscriberInterface
 
     public function onImportProcess(ImportProcessEvent $event): void
     {
+        if (!$this->config->isPublished()) {
+            return;
+        }
+
         $data                    = $event->rowData;
         $data['file']            = $event->import->getOriginalFile();
         $data['totalLine']       = $event->import->getLineCount();
         $data['created_by_name'] = 'Unknown User';
         $data['created_by_id']   = 0;
         $ownerId                 = $event->import->getDefault('owner');
-        $user                    = $this->userModel->getRepository()->find($ownerId);
-
-        if (null !== $user) {
-            $data['created_by_name'] = $user->getName();
-            $data['created_by_id']   = $user->getId();
+        if (null !== $ownerId) {
+            $user = $this->userModel->getRepository()->find($ownerId);
+            if (null !== $user) {
+                $data['created_by_name'] = $user->getName();
+                $data['created_by_id']   = $user->getId();
+            }
         }
+
 
         try {
             $duplicateCompanies = $this->companyDeduper->checkForDuplicateCompanies($this->getFieldData($event->import->getMatchedFields(), $data));
