@@ -1,39 +1,70 @@
-# CompanyTimelineBundle
+# LeuchtfeuerCompanyTimelineBundle
 
 ## Overview
+This plugin adds a history tab to Mautic companies, containing a timeline of related events.
 
-The **CompanyTimelineBundle** plugin adds timeline functionality for company entities in Mautic. It enables tracking and displaying company-related activities, events, and interactions in a timeline view.
+It is part of the "ABM" suite of plugins that extends Mautic capabilities for working with Companies.
 
-## Features
-
-- Displays a timeline of company activities.
-- Integrates with Mautic company entities.
-- Customizable event types and display options.
+# Requirements
+- Mautic 5.x (minimum 5.1)
+- PHP 8.1 or higher
 
 ## Installation
+### Composer
+This plugin can be installed through composer.
 
-1. Copy the `LeuchtfeuerCompanyTimelineBundle` folder to your Mautic `plugins` directory.
-2. Clear the cache:
-   ```
-   php bin/console cache:clear
-   ```
-3. Go to **Settings > Plugins** in the Mautic admin panel and click **Install/Update Plugins**.
-
-## Usage
-
-- Navigate to a company record in Mautic.
-- The timeline tab will show all tracked activities and events for the company.
-- Configure event types and display settings in the plugin configuration.
+### Manual Installation
+Alternatively, it can be installed manually, following the usual steps:
+- Download the plugin
+- Unzip to the Mautic `plugins` directory
+- Rename folder to `LeuchtfeuerCompanyTimelineBundle`
+- In the Mautic backend, go to the `Plugins` page as an administrator
+- Click on the `Install/Upgrade Plugins` button to install the Plugin.
+  OR
+- If you have shell access, execute `php bin\console cache:clear` and `php bin\console mautic:plugins:reload` to install the plugins.
 
 ## Configuration
+1. Go to `Plugins` page
+2. Click on the `Company Timeline` plugin
+3. ENABLE the plugin
 
-- Go to **Settings > Plugins > CompanyTimelineBundle**.
-- Set up event types, filters, and display preferences as needed.
+## Usage
+- Navigate to a company record in Mautic.
+- The history tab will show all tracked activities and events for the company.
+
+## Known Issues
+
+## Troubleshooting
+Make sure you have not only installed but also enabled the Plugin.
+
+If things are still funny, please try
+
+`php bin/console cache:clear`
+
+and
+
+`php bin/console mautic:assets:generate`
+
+## Change log
+- [Releases](https://github.com/Leuchtfeuer/mautic-CompanyTimeline-bundle/releases)
+
+## Future Ideas
+
+## Sponsoring & Commercial Support
+We are continuously improving our plugins. If you are requiring priority support or custom features, please contact us at mautic-plugins@leuchtfeuer.com.
+
+## Credits
+* @lenonleite
+
+## Author
+Leuchtfeuer Digital Marketing GmbH
+
+Please raise any issues in GitHub.
+
+For all other things, please email mautic-plugins@Leuchtfeuer.com
 
 ## Support
-
-For issues or feature requests, please open an issue in the [Mautic GitHub repository](https://github.com/mautic/mautic/issues).
+For issues or feature requests, please open an issue in the [Mautic GitHub repository](https://github.com/Leuchtfeuer/mautic-CompanyTimeline-bundle/issues).
 
 ## License
-
-This plugin is released under the MIT License.
+“This plugin is licensed under the MIT License. See the `LICENSE` file for more details.”
