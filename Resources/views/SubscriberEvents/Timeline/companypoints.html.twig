@@ -1,0 +1,10 @@
+{% if event.extra is defined %}
+<dl class="dl-horizontal">
+    <dt>Points change from </dt>
+    <dd>{{ event.extra.changes.from }}</dd>
+    <dt>to</dt>
+    <dd>
+        {{ event.extra.changes.to }}
+    </dd>
+</dl>
+{% endif %}
