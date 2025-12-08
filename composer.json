@@ -4,10 +4,10 @@
   "type": "mautic-plugin",
   "license": "GPL-3.0-or-later",
   "authors": [
-      {
-          "name": "Leuchtfeuer Digital Marketing GmbH",
-          "email": "mautic-plugins@Leuchtfeuer.com"
-      }
+    {
+      "name": "Leuchtfeuer Digital Marketing GmbH",
+      "email": "mautic-plugins@Leuchtfeuer.com"
+    }
   ],
   "keywords": [
     "mautic",
@@ -15,11 +15,11 @@
     "integration"
   ],
   "extra": {
-      "install-directory-name": "LeuchtfeuerCompanyTimelineBundle",
+    "install-directory-name": "LeuchtfeuerCompanyTimelineBundle"
   },
   "minimum-stability": "dev",
   "require": {
-      "mautic/core-lib": "^5.0"
+    "mautic/core-lib": "^5.0"
   },
   "autoload": {
     "psr-4": {
