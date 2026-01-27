@@ -6,7 +6,7 @@ This plugin adds a history tab to Mautic companies, containing a timeline of rel
 It is part of the "ABM" suite of plugins that extends Mautic capabilities for working with Companies.
 
 # Requirements
-- Mautic 5.x (minimum 5.1)
+- Mautic 6.x
 - PHP 8.1 or higher
 
 ## Installation
