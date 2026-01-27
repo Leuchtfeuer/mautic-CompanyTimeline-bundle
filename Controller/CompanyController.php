@@ -3,7 +3,6 @@
 namespace MauticPlugin\LeuchtfeuerCompanyTimelineBundle\Controller;
 
 use Doctrine\Persistence\ManagerRegistry;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
@@ -33,7 +32,6 @@ class CompanyController extends CompanyTagsController
         FormFactoryInterface $formFactory,
         FormFieldHelper $fieldHelper,
         ManagerRegistry $managerRegistry,
-        MauticFactory $factory,
         ModelFactory $modelFactory,
         UserHelper $userHelper,
         CoreParametersHelper $coreParametersHelper,
@@ -51,7 +49,6 @@ class CompanyController extends CompanyTagsController
             $formFactory,
             $fieldHelper,
             $managerRegistry,
-            $factory,
             $modelFactory,
             $userHelper,
             $coreParametersHelper,

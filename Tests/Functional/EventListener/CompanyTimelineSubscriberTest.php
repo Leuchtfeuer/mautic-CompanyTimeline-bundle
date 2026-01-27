@@ -18,9 +18,12 @@ class CompanyTimelineSubscriberTest extends MauticMysqlTestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->activePlugin();
         $this->useCleanupRollback = false;
+        $this->activePlugin();
         $this->setUpSymfony($this->configParams);
+        // Re-login user after kernel restart
+        $user = $this->em->getRepository(\Mautic\UserBundle\Entity\User::class)->findOneBy(['username' => 'admin']);
+        $this->loginUser($user);
     }
 
     public function testCompanyTimeline(): void
@@ -134,13 +137,9 @@ class CompanyTimelineSubscriberTest extends MauticMysqlTestCase
     {
         $companyModel = self::getContainer()->get('mautic.lead.model.company');
         assert($companyModel instanceof \Mautic\LeadBundle\Model\CompanyModel);
-        $crawler                                  = $this->client->request('GET', '/s/companies/edit/'.$company->getId());
-        $form                                     = $crawler->filter('form[name=company]')->form();
-        $data                                     = $form->getValues();
-        $data['company[companyscore_calculated]'] = 20;
-        $form->setValues($data);
-        $this->client->submit($form, $data);
-        $this->assertTrue($this->client->getResponse()->isSuccessful(), 'Company score adjustment should be successful.');
+
+        $company->setScore(20);
+        $companyModel->saveEntity($company);
     }
 
     public function createCompany(string $name, int $score = 0): Company

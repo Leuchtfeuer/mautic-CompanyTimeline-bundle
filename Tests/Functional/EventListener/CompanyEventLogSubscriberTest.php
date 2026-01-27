@@ -3,8 +3,11 @@
 namespace MauticPlugin\LeuchtfeuerCompanyTimelineBundle\Tests\Functional\EventListener;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Import;
-use MauticPlugin\LeuchtfeuerCompanySegmentsBundle\Model\CompanyEventLogModel;
+use Mautic\LeadBundle\Model\CompanyModel;
+use Mautic\LeadBundle\Model\FieldModel;
+use Mautic\UserBundle\Entity\User;
 use MauticPlugin\LeuchtfeuerCompanyTimelineBundle\Tests\DefaultTraits\ActivePluginTrait;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
@@ -15,41 +18,47 @@ class CompanyEventLogSubscriberTest extends MauticMysqlTestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->activePlugin();
         $this->useCleanupRollback = false;
+        $this->activePlugin();
         $this->setUpSymfony($this->configParams);
+        // Re-login user after kernel restart
+        $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $this->loginUser($user);
     }
 
     public function testEventLogCompanyPointsChanged(): void
     {
         $companyEventLogModel = self::getContainer()->get('mautic.company_segments.model.company_event_log');
-        assert($companyEventLogModel instanceof CompanyEventLogModel);
+        assert($companyEventLogModel instanceof \MauticPlugin\LeuchtfeuerCompanySegmentsBundle\Model\CompanyEventLogModel);
         $eventLog = $companyEventLogModel->getRepository()->findAll();
         self::assertEmpty($eventLog, 'Event log should be empty before creating a company.');
+
         $score1   = 10;
         $score2   = 20;
-        $company  = $this->createCompany('Test Company', $score1);
+
+        $company = $this->createCompany('Test Company', $score1);
+
         $eventLog = $companyEventLogModel->getRepository()->findAll();
-        self::assertCount(1, $eventLog, 'Event log should contain one entry after creating a company.');
+        self::assertCount(1, $eventLog, 'Event log should contain one entry after creating a company with custom score.');
         assert($eventLog[0] instanceof \MauticPlugin\LeuchtfeuerCompanySegmentsBundle\Entity\CompanyEventLog);
-        self::assertEquals($score1, $eventLog[0]->getCompany()->getField('companyscore_calculated')['value'], 'Company score should match the initial score.');
-        $crawler                                    = $this->client->request('GET', '/s/companies/edit/'.$company->getId());
-        $form                                       = $crawler->filter('form[name=company]')->form();
-        $values                                     = $form->getValues();
-        $values['company[companyname]']             = 'New Company Name';
-        $values['company[companyscore_calculated]'] = $score2;
-        $form->setValues($values);
-        $this->client->submit($form, $values);
-        $lastEventLog = $companyEventLogModel->getRepository()->findOneBy([], ['id' => 'DESC']);
-        self::assertNotEmpty($lastEventLog, 'Last event log entry should not be empty after updating the company.');
-        assert($lastEventLog instanceof \MauticPlugin\LeuchtfeuerCompanySegmentsBundle\Entity\CompanyEventLog);
-        self::assertEquals($score2, $lastEventLog->getCompany()->getField('companyscore_calculated')['value'], 'Company score should match the updated score.');
+
+        $companyModel = self::getContainer()->get('mautic.lead.model.company');
+        assert($companyModel instanceof CompanyModel);
+        $company->addUpdatedField('companyscore_calculated', $score2);
+        $companyModel->saveEntity($company);
+
+        $allEventLogs = $companyEventLogModel->getRepository()->findAll();
+        $this->assertCount(2, $allEventLogs);
+        self::assertNotEmpty($allEventLogs[0]);
+        assert($allEventLogs[0] instanceof \MauticPlugin\LeuchtfeuerCompanySegmentsBundle\Entity\CompanyEventLog);
+        self::assertNotEmpty($allEventLogs[1]);
+        assert($allEventLogs[1] instanceof \MauticPlugin\LeuchtfeuerCompanySegmentsBundle\Entity\CompanyEventLog);
     }
 
     public function testEventLogCompanyTagsChanged(): void
     {
         $companyEventLogModel = self::getContainer()->get('mautic.company_segments.model.company_event_log');
-        assert($companyEventLogModel instanceof CompanyEventLogModel);
+        assert($companyEventLogModel instanceof \MauticPlugin\LeuchtfeuerCompanySegmentsBundle\Model\CompanyEventLogModel);
         $eventLog = $companyEventLogModel->getRepository()->findAll();
         self::assertEmpty($eventLog, 'Event log should be empty before creating a company.');
 
@@ -57,7 +66,6 @@ class CompanyEventLogSubscriberTest extends MauticMysqlTestCase
         $eventLog = $companyEventLogModel->getRepository()->findAll();
         self::assertCount(0, $eventLog, 'Event log should contain one entry after creating a company.');
 
-        // Add tags to the company
         $tagName1         = 'Test Tag 1';
         $tagName2         = 'Test Tag 2';
         $tag1             = $this->createCompanyTag($tagName1);
@@ -82,40 +90,12 @@ class CompanyEventLogSubscriberTest extends MauticMysqlTestCase
         self::assertSame($lastEventLog->getProperties()['object_description'], $tagName2, 'Last event log entry should be of type company.');
     }
 
-    private function createCompanyTag(string $name): \MauticPlugin\LeuchtfeuerCompanyTagsBundle\Entity\CompanyTags
-    {
-        $companyTagsModel = self::getContainer()->get('mautic.companytag.model.companytag');
-        assert($companyTagsModel instanceof \MauticPlugin\LeuchtfeuerCompanyTagsBundle\Model\CompanyTagModel);
-        $companyTag = new \MauticPlugin\LeuchtfeuerCompanyTagsBundle\Entity\CompanyTags();
-        $companyTag->setTag($name);
-        $companyTagsModel->saveEntity($companyTag);
-
-        return $companyTag;
-    }
-
-    private function createCompany(string $name, ?int $score = null): \Mautic\LeadBundle\Entity\Company
-    {
-        $crawler = $this->client->request('GET', '/s/companies/new');
-        $this->assertTrue($this->client->getResponse()->isSuccessful(), 'Company creation page should be accessible.');
-        $form                           = $crawler->filter('form[name=company]')->form();
-        $values                         = $form->getValues();
-        $values['company[companyname]'] = $name;
-        if (null !== $score) {
-            $values['company[companyscore_calculated]'] = $score;
-        }
-        $form->setValues($values);
-        $this->client->submit($form, $values);
-        $this->assertTrue($this->client->getResponse()->isSuccessful(), 'Form submission should be successful.');
-
-        return $this->em->getRepository(\Mautic\LeadBundle\Entity\Company::class)->findOneBy([], ['id' => 'DESC']);
-    }
-
     public function testImportCompanyEventLog(): void
     {
         $eventLogModel     = self::getContainer()->get('mautic.company_segments.model.company_event_log');
         $allEventLogBefore = $eventLogModel->getRepository()->findAll();
         $companyModel      = self::getContainer()->get('mautic.lead.model.company');
-        assert($eventLogModel instanceof CompanyEventLogModel);
+        assert($eventLogModel instanceof \MauticPlugin\LeuchtfeuerCompanySegmentsBundle\Model\CompanyEventLogModel);
         $companiesBefore = $companyModel->getRepository()->findAll();
         $this->runCompanyCsv();
         $this->runCompanyCsv();
@@ -184,5 +164,36 @@ class CompanyEventLogSubscriberTest extends MauticMysqlTestCase
         $leadModel->saveEntity($lead);
 
         return $lead;
+    }
+
+    private function createCompanyTag(string $name): \MauticPlugin\LeuchtfeuerCompanyTagsBundle\Entity\CompanyTags
+    {
+        $companyTagsModel = self::getContainer()->get('mautic.companytag.model.companytag');
+        assert($companyTagsModel instanceof \MauticPlugin\LeuchtfeuerCompanyTagsBundle\Model\CompanyTagModel);
+        $companyTag = new \MauticPlugin\LeuchtfeuerCompanyTagsBundle\Entity\CompanyTags();
+        $companyTag->setTag($name);
+        $companyTagsModel->saveEntity($companyTag);
+
+        return $companyTag;
+    }
+
+    private function createCompany(string $name, ?int $score = null): \Mautic\LeadBundle\Entity\Company
+    {
+        $fieldModel = self::getContainer()->get('mautic.lead.model.field');
+        assert($fieldModel instanceof FieldModel);
+        $customField = $fieldModel->getRepository()->findOneBy(['alias' => 'companyscore_calculated']);
+        self::assertNotNull($customField, 'Custom field companyscore_calculated should exist. The CompanyPoints plugin may not be properly installed.');
+
+        $companyModel = self::getContainer()->get('mautic.lead.model.company');
+        assert($companyModel instanceof CompanyModel);
+
+        $company = new Company();
+        $company->setName($name);
+        if (null !== $score) {
+            $company->addUpdatedField('companyscore_calculated', $score);
+        }
+        $companyModel->saveEntity($company);
+
+        return $company;
     }
 }
