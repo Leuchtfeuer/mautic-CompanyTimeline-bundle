@@ -42,7 +42,7 @@ class CompanyController extends CompanyTagsController
         private CompanyTagModel $companyTagModel,
         CompanyTagsConfig $companyTagsConfig,
         private CustomCompanyEventLogModel $customCompanyEventLogModel,
-        private Config $config
+        private Config $config,
     ) {
         parent::__construct(
             $formFactory,

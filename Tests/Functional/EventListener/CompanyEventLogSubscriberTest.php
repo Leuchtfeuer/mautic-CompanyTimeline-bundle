@@ -23,7 +23,7 @@ class CompanyEventLogSubscriberTest extends MauticMysqlTestCase
         $this->setUpSymfony($this->configParams);
         // Re-login user after kernel restart
         $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
-        $this->assertInstanceOf(\Mautic\UserBundle\Entity\User::class, $user);
+        $this->assertInstanceOf(User::class, $user);
         $this->loginUser($user);
     }
 
@@ -92,7 +92,7 @@ class CompanyEventLogSubscriberTest extends MauticMysqlTestCase
         assert($eventLogModel instanceof \MauticPlugin\LeuchtfeuerCompanySegmentsBundle\Model\CompanyEventLogModel);
         $allEventLogBefore = $eventLogModel->getRepository()->findAll();
         $companyModel      = self::getContainer()->get('mautic.lead.model.company');
-        assert($companyModel instanceof \Mautic\LeadBundle\Model\CompanyModel);
+        assert($companyModel instanceof CompanyModel);
         $companiesBefore = $companyModel->getRepository()->findAll();
         $this->runCompanyCsv();
         $this->runCompanyCsv();
@@ -115,8 +115,8 @@ class CompanyEventLogSubscriberTest extends MauticMysqlTestCase
         $uploadForm['lead_import[file]']->setValue((string) $file);
         $crawler                                        = $this->client->submit($uploadForm);
         $mappingForm                                    = $crawler->selectButton('Import')->form();
-        $firstUser                                      = $this->em->getRepository(\Mautic\UserBundle\Entity\User::class)->findOneBy([], ['id' => 'ASC']);
-        $this->assertInstanceOf(\Mautic\UserBundle\Entity\User::class, $firstUser);
+        $firstUser                                      = $this->em->getRepository(User::class)->findOneBy([], ['id' => 'ASC']);
+        $this->assertInstanceOf(User::class, $firstUser);
         $mappingForm['lead_field_import[company_name]'] = 'companyname';
         $mappingForm['lead_field_import[company_name]'] = 'companyname';
         $mappingForm['lead_field_import[owner]']        = $firstUser->getId();
@@ -135,7 +135,7 @@ class CompanyEventLogSubscriberTest extends MauticMysqlTestCase
         $eventLogModel = self::getContainer()->get('mautic.company_segments.model.company_event_log');
         assert($eventLogModel instanceof \MauticPlugin\LeuchtfeuerCompanySegmentsBundle\Model\CompanyEventLogModel);
         $companyModel  = self::getContainer()->get('mautic.lead.model.company');
-        assert($companyModel instanceof \Mautic\LeadBundle\Model\CompanyModel);
+        assert($companyModel instanceof CompanyModel);
         $leadModel = self::getContainer()->get('mautic.lead.model.lead');
         assert($leadModel instanceof \Mautic\LeadBundle\Model\LeadModel);
 
@@ -180,7 +180,7 @@ class CompanyEventLogSubscriberTest extends MauticMysqlTestCase
         return $companyTag;
     }
 
-    private function createCompany(string $name, ?int $score = null): \Mautic\LeadBundle\Entity\Company
+    private function createCompany(string $name, ?int $score = null): Company
     {
         $fieldModel = self::getContainer()->get('mautic.lead.model.field');
         assert($fieldModel instanceof FieldModel);
