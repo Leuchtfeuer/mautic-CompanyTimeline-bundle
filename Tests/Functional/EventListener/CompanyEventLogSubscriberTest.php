@@ -23,6 +23,7 @@ class CompanyEventLogSubscriberTest extends MauticMysqlTestCase
         $this->setUpSymfony($this->configParams);
         // Re-login user after kernel restart
         $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $this->assertInstanceOf(\Mautic\UserBundle\Entity\User::class, $user);
         $this->loginUser($user);
     }
 
@@ -40,7 +41,6 @@ class CompanyEventLogSubscriberTest extends MauticMysqlTestCase
 
         $eventLog = $companyEventLogModel->getRepository()->findAll();
         self::assertCount(1, $eventLog, 'Event log should contain one entry after creating a company with custom score.');
-        assert($eventLog[0] instanceof \MauticPlugin\LeuchtfeuerCompanySegmentsBundle\Entity\CompanyEventLog);
 
         $companyModel = self::getContainer()->get('mautic.lead.model.company');
         assert($companyModel instanceof CompanyModel);
@@ -49,10 +49,6 @@ class CompanyEventLogSubscriberTest extends MauticMysqlTestCase
 
         $allEventLogs = $companyEventLogModel->getRepository()->findAll();
         $this->assertCount(2, $allEventLogs);
-        self::assertNotEmpty($allEventLogs[0]);
-        assert($allEventLogs[0] instanceof \MauticPlugin\LeuchtfeuerCompanySegmentsBundle\Entity\CompanyEventLog);
-        self::assertNotEmpty($allEventLogs[1]);
-        assert($allEventLogs[1] instanceof \MauticPlugin\LeuchtfeuerCompanySegmentsBundle\Entity\CompanyEventLog);
     }
 
     public function testEventLogCompanyTagsChanged(): void
@@ -93,9 +89,10 @@ class CompanyEventLogSubscriberTest extends MauticMysqlTestCase
     public function testImportCompanyEventLog(): void
     {
         $eventLogModel     = self::getContainer()->get('mautic.company_segments.model.company_event_log');
+        assert($eventLogModel instanceof \MauticPlugin\LeuchtfeuerCompanySegmentsBundle\Model\CompanyEventLogModel);
         $allEventLogBefore = $eventLogModel->getRepository()->findAll();
         $companyModel      = self::getContainer()->get('mautic.lead.model.company');
-        assert($eventLogModel instanceof \MauticPlugin\LeuchtfeuerCompanySegmentsBundle\Model\CompanyEventLogModel);
+        assert($companyModel instanceof \Mautic\LeadBundle\Model\CompanyModel);
         $companiesBefore = $companyModel->getRepository()->findAll();
         $this->runCompanyCsv();
         $this->runCompanyCsv();
@@ -104,7 +101,9 @@ class CompanyEventLogSubscriberTest extends MauticMysqlTestCase
         self::assertNotSame($companiesBefore, $companiesLater);
         self::assertNotSame(count($allEventLogBefore), count($allEventLogLater), 'Event log should be updated after importing companies.');
         $lastCompany = end($companiesLater);
+        assert($lastCompany instanceof Company);
         $this->client->request('GET', '/s/companies/view/'.$lastCompany->getId());
+        $this->assertIsString($this->client->getResponse()->getContent());
         self::assertStringContainsString('Company import from by', $this->client->getResponse()->getContent(), 'Company import event log should be present in the company view.');
     }
 
@@ -117,12 +116,14 @@ class CompanyEventLogSubscriberTest extends MauticMysqlTestCase
         $crawler                                        = $this->client->submit($uploadForm);
         $mappingForm                                    = $crawler->selectButton('Import')->form();
         $firstUser                                      = $this->em->getRepository(\Mautic\UserBundle\Entity\User::class)->findOneBy([], ['id' => 'ASC']);
+        $this->assertInstanceOf(\Mautic\UserBundle\Entity\User::class, $firstUser);
         $mappingForm['lead_field_import[company_name]'] = 'companyname';
         $mappingForm['lead_field_import[company_name]'] = 'companyname';
         $mappingForm['lead_field_import[owner]']        = $firstUser->getId();
         $this->client->submit($mappingForm);
         $imports    = $this->em->getRepository(Import::class)->findAll();
         $lastImport = end($imports);
+        $this->assertInstanceOf(Import::class, $lastImport);
         $this->em->clear();
         $output = $this->testSymfonyCommand('mautic:import', ['-e' => 'dev', '--id' => $lastImport->getId(), '--limit' => 10000]);
         self::assertStringContainsString('3 lines were processed', $output->getDisplay(), 'Import command should process 3 lines.');
@@ -132,6 +133,7 @@ class CompanyEventLogSubscriberTest extends MauticMysqlTestCase
     public function testAddRemoveLeadToCompany(): void
     {
         $eventLogModel = self::getContainer()->get('mautic.company_segments.model.company_event_log');
+        assert($eventLogModel instanceof \MauticPlugin\LeuchtfeuerCompanySegmentsBundle\Model\CompanyEventLogModel);
         $companyModel  = self::getContainer()->get('mautic.lead.model.company');
         assert($companyModel instanceof \Mautic\LeadBundle\Model\CompanyModel);
         $leadModel = self::getContainer()->get('mautic.lead.model.lead');
@@ -150,6 +152,7 @@ class CompanyEventLogSubscriberTest extends MauticMysqlTestCase
         self::assertNotSame(count($eventLogAfterAdd), count($eventLogAfterRemove));
 
         $this->client->request('GET', '/s/companies/view/'.$company->getId());
+        $this->assertIsString($this->client->getResponse()->getContent());
         self::assertStringContainsString('to added company.', $this->client->getResponse()->getContent(), 'Lead added event log should be present in the company view.');
         self::assertStringContainsString('from removed company.', $this->client->getResponse()->getContent(), 'Lead added event log should be present in the company view.');
     }
