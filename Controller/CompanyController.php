@@ -3,7 +3,6 @@
 namespace MauticPlugin\LeuchtfeuerCompanyTimelineBundle\Controller;
 
 use Doctrine\Persistence\ManagerRegistry;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
@@ -28,12 +27,10 @@ use Symfony\Component\HttpFoundation\Response;
 
 class CompanyController extends CompanyTagsController
 {
-    // @phpstan-ignore-next-line
     public function __construct(
         FormFactoryInterface $formFactory,
         FormFieldHelper $fieldHelper,
         ManagerRegistry $managerRegistry,
-        MauticFactory $factory,
         ModelFactory $modelFactory,
         UserHelper $userHelper,
         CoreParametersHelper $coreParametersHelper,
@@ -45,13 +42,12 @@ class CompanyController extends CompanyTagsController
         private CompanyTagModel $companyTagModel,
         CompanyTagsConfig $companyTagsConfig,
         private CustomCompanyEventLogModel $customCompanyEventLogModel,
-        private Config $config
+        private Config $config,
     ) {
         parent::__construct(
             $formFactory,
             $fieldHelper,
             $managerRegistry,
-            $factory,
             $modelFactory,
             $userHelper,
             $coreParametersHelper,

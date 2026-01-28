@@ -9,7 +9,6 @@ use Mautic\LeadBundle\Event\ImportProcessEvent;
 use Mautic\LeadBundle\Event\LeadChangeCompanyEvent;
 use Mautic\LeadBundle\Exception\UniqueFieldNotFoundException;
 use Mautic\LeadBundle\LeadEvents;
-use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\UserBundle\Model\UserModel;
 use MauticPlugin\LeuchtfeuerCompanyTagsBundle\Event\CompanyTagsEvent;
 use MauticPlugin\LeuchtfeuerCompanyTagsBundle\LeuchtfeuerCompanyTagsEvents;
@@ -145,7 +144,6 @@ class CompanyEventLogSubscriber implements EventSubscriberInterface
                 $data['created_by_id']   = $user->getId();
             }
         }
-
 
         try {
             $duplicateCompanies = $this->companyDeduper->checkForDuplicateCompanies($this->getFieldData($event->import->getMatchedFields(), $data));

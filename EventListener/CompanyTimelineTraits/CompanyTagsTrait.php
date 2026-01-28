@@ -14,7 +14,7 @@ trait CompanyTagsTrait
         $bundle = null,
         $object = null,
         $action = null,
-        $contentTemplate = null
+        $contentTemplate = null,
     ): void {
         $eventTypeName = $this->translator->trans($eventTypeName);
         $event->addEventType($eventType, $eventTypeName);
