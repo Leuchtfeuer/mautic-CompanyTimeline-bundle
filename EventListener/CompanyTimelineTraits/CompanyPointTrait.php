@@ -32,7 +32,7 @@ trait CompanyPointTrait
         foreach ($events['results'] as $log) {
             $properties = json_decode($log['properties'], true);
             $eventLabel = $this->translator->trans('mautic.company_timeline.timeline.companypoints.changed', [
-                '%oldpoints%' => $properties['changes']['from'],
+                '%oldpoints%' => (int) $properties['changes']['from'],
                 '%points%'    => $properties['changes']['to'],
             ]);
 
