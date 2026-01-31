@@ -8,6 +8,7 @@ It is part of the "ABM" suite of plugins that extends Mautic capabilities for wo
 # Requirements
 - Mautic 5.x (minimum 5.1)
 - PHP 8.1 or higher
+- ABM Plugins "Company Segments", "Company Tags", "Company Points"
 
 ## Installation
 ### Composer
