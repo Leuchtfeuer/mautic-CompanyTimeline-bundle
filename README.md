@@ -54,7 +54,14 @@ and
 We are continuously improving our plugins. If you are requiring priority support or custom features, please contact us at mautic-plugins@leuchtfeuer.com.
 
 ## Credits
+* @biozshock
+* @ekkeguembel
+* @JonasLudwig1998
 * @lenonleite
+* @LeonOltmanns
+* @MadlenF
+* @PatrickJenkner
+* @patrykgruszka
 
 ## Author
 Leuchtfeuer Digital Marketing GmbH
