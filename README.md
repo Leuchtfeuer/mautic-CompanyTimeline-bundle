@@ -5,7 +5,7 @@ This plugin adds a history tab to Mautic companies, containing a timeline of rel
 
 It is part of the "ABM" suite of plugins that extends Mautic capabilities for working with Companies.
 
-# Requirements
+## Requirements for this release (other releases may cover different Mautic versions!)
 - Mautic 6
 - ABM Plugins "Company Segments", "Company Tags", "Company Points"
 
