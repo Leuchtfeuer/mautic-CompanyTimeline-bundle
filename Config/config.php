@@ -5,7 +5,7 @@ declare(strict_types=1);
 return [
     'name'        => 'Leuchtfeuer Digital Marketing GmbH',
     'description' => 'Add a detailed history tab for Companies',
-    'version'     => '6.1.1',
+    'version'     => '6.1.2',
     'author'      => 'Leuchtfeuer Digital Marketing GmbH',
     'services'    => [
         'integrations' => [
