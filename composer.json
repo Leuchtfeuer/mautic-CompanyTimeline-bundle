@@ -2,7 +2,7 @@
   "name": "leuchtfeuer/mautic-companytimeline-bundle",
   "description": "Add a detailed history tab for Companies",
   "type": "mautic-plugin",
-  "license": "GPL-3.0-or-later",
+  "license": "GPL-3.0",
   "authors": [
       {
           "name": "Leuchtfeuer Digital Marketing GmbH",
