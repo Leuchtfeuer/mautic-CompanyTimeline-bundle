@@ -75,4 +75,4 @@ For all other things, please email mautic-plugins@Leuchtfeuer.com
 For issues or feature requests, please open an issue in the [Mautic GitHub repository](https://github.com/Leuchtfeuer/mautic-CompanyTimeline-bundle/issues).
 
 ## License
-“This plugin is licensed under the MIT License. See the `LICENSE` file for more details.”
+This plugin is licensed under the GPL v3 License.
