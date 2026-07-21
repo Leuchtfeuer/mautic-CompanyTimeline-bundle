@@ -12,12 +12,10 @@ trait CompanyTrait
         string $icon,
     ): void {
         $companyName = 'Unknown Company';
-        $dateAdded   = 'Unknown Date';
+        $dateAdded   = null;
         if ($event->getCompany()) {
             $companyName = $event->getCompany()->getName();
-            if (null !== $event->getCompany()->getDateAdded()) {
-                $dateAdded = $event->getCompany()->getDateAdded()->format('Y-m-d H:i:s');
-            }
+            $dateAdded   = $event->getCompany()->getDateAdded();
         }
         $eventName = $this->translator->trans('mautic.company_timeline.timeline.company.created.label', [
             '%company%' => $companyName,
