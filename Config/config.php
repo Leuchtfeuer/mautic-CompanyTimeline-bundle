@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 return [
-    'name'        => 'Company Timeline',
+    'name'        => 'Company Timeline by Leuchtfeuer',
     'description' => 'Add a detailed history tab for Companies',
     'version'     => '6.1.3',
     'author'      => 'Leuchtfeuer Digital Marketing GmbH',
